@@ -1,0 +1,304 @@
+supabase.com
+
+
+Password: Sa654_ad321
+
+project name Tm001
+database password: tm654_tm321
+project id: cswykyyrskhqxdfzdozl
+project url: https://cswykyyrskhqxdfzdozl.supabase.co
+public api key: sb_publishable_lJgmXVlN9EqPoyOMXhnTwQ__6WS_n_v
+
+
+Prompt To Create web pages:
+
+create a complete professional SaaS-style website. The website must include the following pages and systems:
+High-quality modern landing page with:
+-[] Clean hero section
+-[] Headline, subheadling, CTA buttons
+-[] Features section
+-[] pricing section
+-[] FAQ section
+-[] Footer
+-[] Fully responsive layout
+-[] Smooth animations
+Authentication System:
+-[] Signup page
+-[] login page
+Admin panel:
+-[] open with URL parameter ?admin=true
+-[] admin login with fix credentials: username:admin password:admin123
+-[] use a professional color paette
+-[] code must be clean and well commented
+-[] must run directly in browser
+ 
+
+
+write a prompt for to create a mobile app in html which include login page, signup page, dashboard 
+
+Prompt:
+
+Create a responsive mobile-first web application using HTML, CSS, and JavaScript (no frameworks required, but optional use of lightweight libraries is allowed).
+
+The app should include the following screens:
+
+1. Login Page
+Simple and modern UI
+Fields: Email, Password
+"Login" button
+Link to "Sign Up" page
+Basic validation (required fields, email format)
+Show error message for invalid login
+2. Signup Page
+Fields: Full Name, Email, Password, Confirm Password
+"Sign Up" button
+Link back to Login page
+Validate:
+Password match
+Minimum password length
+Show success message and redirect to Login
+3. Dashboard Page
+Clean mobile-style layout
+Top header with app name and logout button
+Welcome message (e.g., "Welcome, [User Name]")
+Simple cards or sections (e.g., Profile, Settings, Activity)
+Navigation should feel like a mobile app (centered container, smooth transitions)
+Functional Requirements:
+Use localStorage to simulate authentication (store user data)
+Maintain login session (stay logged in unless logout is clicked)
+Redirect users:
+If not logged in → Login page
+If logged in → Dashboard
+Logout should clear session and return to Login page
+Design Requirements:
+Mobile-first design (max-width ~400px centered layout)
+Use soft shadows, rounded corners, and modern UI styling
+Use clean typography and spacing
+Add subtle animations (button hover, page transitions)
+Output:
+Provide complete working code in a single HTML file (including CSS and JS inside)
+Code should be well-structured and commented
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mobile App</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f3f4f6;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+    }
+
+    .app {
+        width: 100%;
+        max-width: 400px;
+        min-height: 100vh;
+        background: #fff;
+        box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    h2 {
+        text-align: center;
+    }
+
+    input {
+        width: 100%;
+        padding: 12px;
+        margin: 8px 0;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+        background: #4f46e5;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    button:hover {
+        background: #4338ca;
+    }
+
+    .link {
+        text-align: center;
+        margin-top: 10px;
+        color: #4f46e5;
+        cursor: pointer;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .error {
+        color: red;
+        font-size: 14px;
+        text-align: center;
+    }
+
+    .success {
+        color: green;
+        font-size: 14px;
+        text-align: center;
+    }
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .card {
+        background: #f9fafb;
+        padding: 15px;
+        margin-top: 15px;
+        border-radius: 12px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+    <!-- LOGIN -->
+    <div id="loginPage">
+        <h2>Login</h2>
+        <input type="email" id="loginEmail" placeholder="Email">
+        <input type="password" id="loginPassword" placeholder="Password">
+        <button onclick="login()">Login</button>
+        <div class="error" id="loginError"></div>
+        <div class="link" onclick="showPage('signupPage')">Don't have an account? Sign Up</div>
+    </div>
+
+    <!-- SIGNUP -->
+    <div id="signupPage" class="hidden">
+        <h2>Sign Up</h2>
+        <input type="text" id="signupName" placeholder="Full Name">
+        <input type="email" id="signupEmail" placeholder="Email">
+        <input type="password" id="signupPassword" placeholder="Password">
+        <input type="password" id="signupConfirm" placeholder="Confirm Password">
+        <button onclick="signup()">Sign Up</button>
+        <div class="error" id="signupError"></div>
+        <div class="success" id="signupSuccess"></div>
+        <div class="link" onclick="showPage('loginPage')">Already have an account? Login</div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="dashboardPage" class="hidden">
+        <div class="header">
+            <h3>Dashboard</h3>
+            <button onclick="logout()" style="width:auto;padding:6px 10px;">Logout</button>
+        </div>
+        <h2 id="welcomeText"></h2>
+
+        <div class="card">👤 Profile Section</div>
+        <div class="card">⚙️ Settings</div>
+        <div class="card">📊 Activity</div>
+    </div>
+
+</div>
+
+<script>
+function showPage(pageId) {
+    document.getElementById('loginPage').classList.add('hidden');
+    document.getElementById('signupPage').classList.add('hidden');
+    document.getElementById('dashboardPage').classList.add('hidden');
+
+    document.getElementById(pageId).classList.remove('hidden');
+}
+
+// SIGNUP
+function signup() {
+    let name = document.getElementById('signupName').value.trim();
+    let email = document.getElementById('signupEmail').value.trim();
+    let password = document.getElementById('signupPassword').value;
+    let confirm = document.getElementById('signupConfirm').value;
+
+    let error = document.getElementById('signupError');
+    let success = document.getElementById('signupSuccess');
+
+    error.innerText = "";
+    success.innerText = "";
+
+    if (!name || !email || !password || !confirm) {
+        error.innerText = "All fields are required";
+        return;
+    }
+
+    if (password.length < 6) {
+        error.innerText = "Password must be at least 6 characters";
+        return;
+    }
+
+    if (password !== confirm) {
+        error.innerText = "Passwords do not match";
+        return;
+    }
+
+    let user = { name, email, password };
+    localStorage.setItem('user', JSON.stringify(user));
+
+    success.innerText = "Signup successful! Redirecting...";
+    setTimeout(() => showPage('loginPage'), 1500);
+}
+
+// LOGIN
+function login() {
+    let email = document.getElementById('loginEmail').value.trim();
+    let password = document.getElementById('loginPassword').value;
+    let error = document.getElementById('loginError');
+
+    error.innerText = "";
+
+    let storedUser = JSON.parse(localStorage.getItem('user'));
+
+    if (!storedUser || storedUser.email !== email || storedUser.password !== password) {
+        error.innerText = "Invalid email or password";
+        return;
+    }
+
+    localStorage.setItem('loggedIn', 'true');
+    loadDashboard();
+}
+
+// LOAD DASHBOARD
+function loadDashboard() {
+    let user = JSON.parse(localStorage.getItem('user'));
+    document.getElementById('welcomeText').innerText = "Welcome, " + user.name;
+    showPage('dashboardPage');
+}
+
+// LOGOUT
+function logout() {
+    localStorage.removeItem('loggedIn');
+    showPage('loginPage');
+}
+
+// AUTO LOGIN CHECK
+window.onload = function() {
+    if (localStorage.getItem('loggedIn') === 'true') {
+        loadDashboard();
+    } else {
+        showPage('loginPage');
+    }
+}
+</script>
+
+</body>
+</html>
+
+
+
