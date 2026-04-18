@@ -1,0 +1,63 @@
+Create a responsive mobile-first mobile application using HTML, CSS, and JavaScript (no frameworks required, but optional use of lightweight libraries is allowed).
+
+The app should include the following screens:
+
+1. Login Page
+
+Simple and modern UI
+Fields: Email, Password
+"Login" button
+Link to "Sign Up" page
+Basic validation (required fields, email format)
+Show error message for invalid login
+
+2. Signup Page
+
+Fields: Full Name, Email, Password, Confirm Password
+"Sign Up" button
+Link back to Login page
+Validate:
+Password match
+Minimum password length
+Show success message and redirect to Login
+
+3. Dashboard Page
+
+Clean mobile-style layout
+Top header with app name and logout button
+Welcome message (e.g., "Welcome, [User Name]")
+Simple cards or sections (e.g., Profile, Settings, Activity)
+Navigation should feel like a mobile app (centered container, smooth transitions)
+Functional Requirements:
+Use localStorage to simulate authentication (store user data)
+Maintain login session (stay logged in unless logout is clicked)
+Redirect users:
+If not logged in → Login page
+If logged in → Dashboard
+Logout should clear session and return to Login page
+
+4- Buttons
+create 6 buttons to redirect on the page with page headings
+text on buttons like (cash, sims, mobiles, bank, property, notes)
+
+at the cash page, create buttons to redirect on the page with page headings like Track your expenses, income streams, and budgeting goals. Real-time cash insights and transaction history
+at the sims page, create buttons to redirect on the page with page headtings like sims issue, sims stock, 
+at the mobiles page create buttons to redirect on the page with page headings like mobile name, company, ime , etc
+at the bank page create buttons to redirect on the page with page headings like alfalahbank, meezan bank, hbl bank,habib bank, national bank, new bank
+
+at the cash page on click to the button track your expenses, redirect to the new page with headings Expenses detail and show the Searchable log of all payments, deposits, and transfers. Export data, filter by date, and reconcile accounts effortlessly
+at the cash page on click to the button income streams, redirect to the new page with headings Income details and show the Searchable log of all recive, withdraw, and other income. Export data, filter by date, and reconcile accounts effortlessly
+at the cash page on click to the button Real-time cash insights, redirect to the new page with headings Real-time cash insights, Real‑time Cash Insights Live dashboard with spending patterns and instant notifications . Export data, filter by date, and reconcile accounts effortlessly
+at the cash page on click to the button transaction history, redirect to the new page with headings transaction history, Searchable log of all payments, recives,  Export data, filter by date, and reconcile accounts effortlessly
+
+
+
+Design Requirements:
+
+Mobile-first design (max-width ~400px centered layout)
+Use soft shadows, rounded corners, and modern UI styling
+Use clean typography and spacing
+Add subtle animations (button hover, page transitions,click on button refers to new page with button text heading)
+Output:
+Provide complete working code in a single HTML file (including CSS and JS inside)
+Code should be well-structured and commented
