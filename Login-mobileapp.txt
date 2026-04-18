@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>FlowDash · Secure Login & Modern Landing</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #eef2f9 0%, #e0e7f0 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    /* main card container (shared for auth & landing) */
+    .app-container {
+      max-width: 1300px;
+      width: 100%;
+      margin: 0 auto;
+      transition: all 0.2s ease;
+    }
+
+    /* auth card (login/signup) */
+    .auth-card {
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(2px);
+      max-width: 500px;
+      margin: 0 auto;
+      border-radius: 2.5rem;
+      box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.25), 0 8px 20px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+    }
+
+    .inner-panel {
+      padding: 2rem 2rem 2.2rem;
+    }
+
+    /* landing page styles (beautiful dashboard) */
+    .landing-container {
+      background: #ffffff;
+      border-radius: 2rem;
+      box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      animation: fadeSlideUp 0.4s ease-out;
+    }
+
+    @keyframes fadeSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* navbar */
+    .landing-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.2rem 2rem;
+      background: white;
+      border-bottom: 1px solid #edf2f7;
+      flex-wrap: wrap;
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      background: linear-gradient(145deg, #2563eb, #1e40af);
+      width: 38px;
+      height: 38px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 1.4rem;
+    }
+
+    .logo-text {
+      font-weight: 700;
+      font-size: 1.5rem;
+      background: linear-gradient(135deg, #1e293b, #2d3a4b);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      letter-spacing: -0.3px;
+    }
+
+    .user-greeting {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: #f8fafc;
+      padding: 0.4rem 1rem 0.4rem 1.2rem;
+      border-radius: 40px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .user-avatar {
+      background: #3b82f6;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      text-transform: uppercase;
+    }
+
+    .logout-btn {
+      background: none;
+      border: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #ef4444;
+      cursor: pointer;
+      padding: 0.4rem 0.8rem;
+      border-radius: 30px;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .logout-btn:hover {
+      background: #fee2e2;
+    }
+
+    /* hero section */
+    .hero-section {
+      padding: 2rem 2rem 1.5rem;
+      background: linear-gradient(120deg, #f9fbfe, #ffffff);
+    }
+
+    .hero-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+    }
+
+    .hero-sub {
+      color: #475569;
+      margin-top: 0.5rem;
+      font-size: 1rem;
+      max-width: 80%;
+    }
+
+    /* dashboard stats grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      padding: 1.5rem 2rem;
+      background: #ffffff;
+    }
+
+    .stat-card {
+      background: #f8fafc;
+      border-radius: 1.5rem;
+      padding: 1.2rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: all 0.2s;
+      border: 1px solid #edf2f7;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    }
+
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      background: white;
+      border-radius: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      box-shadow: 0 5px 12px rgba(0,0,0,0.03);
+    }
+
+    .stat-info h4 {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #5b6e8c;
+      letter-spacing: 0.3px;
+    }
+
+    .stat-info .number {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #1e293b;
+      line-height: 1.2;
+    }
+
+    /* buttons grid (main interactive section) */
+    .buttons-section {
+      padding: 0.5rem 2rem 2rem;
+    }
+
+    .section-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 1.2rem;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .button-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 1rem;
+    }
+
+    .action-btn {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 1.2rem;
+      padding: 0.9rem 0.8rem;
+      font-weight: 500;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: #1f2a44;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
+
+    .action-btn i, .action-btn span:first-child {
+      font-size: 1.2rem;
+    }
+
+    .action-btn:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 15px -8px rgba(0,0,0,0.1);
+    }
+
+    .btn-primary-bg {
+      background: #1e293b;
+      border-color: #1e293b;
+      color: white;
+    }
+
+    .btn-primary-bg:hover {
+      background: #0f172a;
+      transform: translateY(-2px);
+    }
+
+    .btn-outline-accent {
+      border-color: #3b82f6;
+      color: #2563eb;
+    }
+
+    .btn-outline-accent:hover {
+      background: #eff6ff;
+    }
+
+    /* recent activity placeholder */
+    .activity-panel {
+      padding: 0 2rem 2rem 2rem;
+    }
+
+    .activity-card {
+      background: #fefefe;
+      border-radius: 1.2rem;
+      border: 1px solid #eef2ff;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .activity-text {
+      color: #334155;
+      font-size: 0.85rem;
+    }
+
+    .badge {
+      background: #e6f0ff;
+      color: #1e40af;
+      padding: 0.25rem 0.75rem;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+
+    footer {
+      font-size: 0.7rem;
+      text-align: center;
+      padding: 1.5rem 2rem;
+      color: #6c7a89;
+      border-top: 1px solid #edf2f7;
+    }
+
+    /* auth shared */
+    h2 {
+      font-size: 1.9rem;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      background: linear-gradient(135deg, #1A2A3F, #2C3E50);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .subhead {
+      color: #5a6e7c;
+      font-size: 0.9rem;
+      margin-bottom: 1.8rem;
+      border-left: 3px solid #3b82f6;
+      padding-left: 0.7rem;
+    }
+
+    .input-group {
+      margin-bottom: 1.4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    label {
+      font-weight: 500;
+      font-size: 0.85rem;
+      color: #1e2a3a;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      font-size: 1rem;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 1.2rem;
+      background: #fefefe;
+      transition: all 0.2s;
+      outline: none;
+    }
+
+    .input-field:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+    }
+
+    .btn-primary {
+      background: #1e293b;
+      color: white;
+      width: 100%;
+      padding: 0.85rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 2rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: #0f172a;
+    }
+
+    .link-row {
+      text-align: center;
+      margin-top: 1.6rem;
+      font-size: 0.9rem;
+    }
+
+    .link-row a {
+      color: #2563eb;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .message-area {
+      margin-top: 1rem;
+      padding: 0.7rem;
+      border-radius: 1.2rem;
+      font-size: 0.85rem;
+      text-align: center;
+    }
+
+    .error-msg {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .success-msg {
+      background: #e0f2fe;
+      color: #0c4a6e;
+    }
+
+    .demo-note {
+      background: #f1f5f9;
+      border-radius: 1.2rem;
+      padding: 0.7rem;
+      font-size: 0.75rem;
+      text-align: center;
+      margin-top: 1.2rem;
+    }
+
+    @media (max-width: 680px) {
+      .hero-sub {
+        max-width: 100%;
+      }
+      .landing-nav {
+        flex-direction: column;
+        gap: 12px;
+        align-items: stretch;
+      }
+      .user-greeting {
+        justify-content: space-between;
+      }
+      .button-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="app-container" id="appRoot">
+  <!-- AUTH CARD (login/signup views) -->
+  <div id="authWrapper" style="display: flex; justify-content: center;">
+    <div class="auth-card">
+      <div class="inner-panel">
+        <!-- LOGIN SECTION -->
+        <div id="loginView" style="display: none;">
+          <h2>Welcome back</h2>
+          <div class="subhead">Sign in to access your dashboard</div>
+          <form id="loginForm">
+            <div class="input-group">
+              <label>Username</label>
+              <input type="text" id="loginUsername" class="input-field" placeholder="e.g., demo, john_doe" autocomplete="username">
+            </div>
+            <div class="input-group">
+              <label>Password</label>
+              <input type="password" id="loginPassword" class="input-field" placeholder="••••••••" autocomplete="current-password">
+            </div>
+            <button type="submit" class="btn-primary">Log in →</button>
+          </form>
+          <div id="loginMessage" class="message-area"></div>
+          <div class="link-row">
+            Don't have an account? <a href="#signup" id="signupLinkNav">Create account</a>
+          </div>
+          <div class="demo-note">🔐 Demo: <strong>demo</strong> / <strong>demo123</strong> &nbsp;|&nbsp; or sign up</div>
+        </div>
+  
+        <!-- SIGNUP SECTION -->
+        <div id="signupView" style="display: none;">
+          <h2>Join FlowDash</h2>
+          <div class="subhead">Create your free account</div>
+          <form id="signupForm">
+            <div class="input-group">
+              <label>Username</label>
+              <input type="text" id="signupUsername" class="input-field" placeholder="Unique username">
+            </div>
+            <div class="input-group">
+              <label>Password</label>
+              <input type="password" id="signupPassword" class="input-field" placeholder="min. 4 characters">
+            </div>
+            <div class="input-group">
+              <label>Confirm password</label>
+              <input type="password" id="signupConfirm" class="input-field" placeholder="confirm password">
+            </div>
+            <button type="submit" class="btn-primary">Sign up →</button>
+          </form>
+          <div id="signupMessage" class="message-area"></div>
+          <div class="link-row">
+            Already have an account? <a href="#login" id="loginLinkNav">Back to Login</a>
+          </div>
+        </div>
+      </div>
+      <footer style="border-top: 1px solid #ecf3fa; padding: 0.8rem; text-align: center; font-size: 0.7rem;">🔒 Secure authentication demo</footer>
+    </div>
+  </div>
+
+  <!-- BEAUTIFUL LANDING PAGE (shown after login) -->
+  <div id="landingView" style="display: none;">
+    <div class="landing-container">
+      <!-- navigation bar -->
+      <div class="landing-nav">
+        <div class="logo-area">
+          <div class="logo-icon">⚡</div>
+          <div class="logo-text">FlowDash</div>
+        </div>
+        <div class="user-greeting">
+          <div class="user-avatar" id="userAvatar">U</div>
+          <span style="font-weight: 500;" id="landingUsername">User</span>
+          <button id="logoutLandingBtn" class="logout-btn">🚪 Logout</button>
+        </div>
+      </div>
+
+      <!-- hero welcome -->
+      <div class="hero-section">
+        <div class="hero-title">Welcome back, <span id="heroUserName">User</span> 👋</div>
+        <div class="hero-sub">Your intelligent dashboard is ready. Explore tools, analytics, and more.</div>
+      </div>
+
+      <!-- stats cards (beauty) -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">📊</div>
+          <div class="stat-info">
+            <h4>Projects</h4>
+            <div class="number">12</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">⭐</div>
+          <div class="stat-info">
+            <h4>Ranking</h4>
+            <div class="number">Top 5%</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">💬</div>
+          <div class="stat-info">
+            <h4>Messages</h4>
+            <div class="number">28</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🎯</div>
+          <div class="stat-info">
+            <h4>Completion</h4>
+            <div class="number">87%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BUTTONS SECTION (main requested feature) -->
+      <div class="buttons-section">
+        <div class="section-title">
+          <span>✨</span> Quick Actions
+        </div>
+        <div class="button-grid">
+          <button class="action-btn" data-action="dashboard">📋 Dashboard</button>
+          <button class="action-btn" data-action="profile">👤 My Profile</button>
+          <button class="action-btn" data-action="analytics">📈 Analytics</button>
+          <button class="action-btn btn-primary-bg" data-action="create">➕ Create New</button>
+          <button class="action-btn btn-outline-accent" data-action="settings">⚙️ Settings</button>
+          <button class="action-btn" data-action="notifications">🔔 Notifications</button>
+          <button class="action-btn" data-action="messages">💬 Messages</button>
+          <button class="action-btn" data-action="explore">🌍 Explore</button>
+        </div>
+      </div>
+
+      <!-- activity / recent updates -->
+      <div class="activity-panel">
+        <div class="section-title" style="margin-bottom: 0.8rem;">📌 Recent activity</div>
+        <div class="activity-card">
+          <div class="activity-text">✨ You logged in successfully</div>
+          <div class="badge">just now</div>
+        </div>
+        <div style="height: 0.6rem;"></div>
+        <div class="activity-card">
+          <div class="activity-text">🎉 New design system deployed</div>
+          <div class="badge">2h ago</div>
+        </div>
+      </div>
+      <footer>
+        ⚡ FlowDash — interactive landing with smart buttons
+      </footer>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ---------- STORAGE KEYS ----------
+  const STORAGE_USERS_KEY = "flowauth_registered_users";
+  const SESSION_USER_KEY = "flowauth_current_user";
+
+  let registeredUsers = [];
+
+  function loadUsersFromStorage() {
+    const stored = localStorage.getItem(STORAGE_USERS_KEY);
+    if (stored) {
+      try {
+        registeredUsers = JSON.parse(stored);
+        if (!Array.isArray(registeredUsers)) registeredUsers = [];
+      } catch(e) { registeredUsers = []; }
+    }
+    if (!registeredUsers.length) {
+      registeredUsers = [{ username: "demo", password: "demo123" }];
+      saveUsersToStorage();
+    }
+  }
+
+  function saveUsersToStorage() {
+    localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(registeredUsers));
+  }
+
+  function addUser(username, password) {
+    const exists = registeredUsers.some(u => u.username === username);
+    if (exists) return false;
+    registeredUsers.push({ username, password });
+    saveUsersToStorage();
+    return true;
+  }
+
+  function validateUser(username, password) {
+    const user = registeredUsers.find(u => u.username === username);
+    return user && user.password === password;
+  }
+
+  // session mgmt
+  function isLoggedIn() {
+    return sessionStorage.getItem(SESSION_USER_KEY) !== null;
+  }
+
+  function getCurrentSessionUser() {
+    const raw = sessionStorage.getItem(SESSION_USER_KEY);
+    if (raw) {
+      try {
+        return JSON.parse(raw);
+      } catch(e) { return null; }
+    }
+    return null;
+  }
+
+  function setLoggedInUser(username) {
+    sessionStorage.setItem(SESSION_USER_KEY, JSON.stringify({ username }));
+  }
+
+  function logoutUser() {
+    sessionStorage.removeItem(SESSION_USER_KEY);
+  }
+
+  // DOM elements
+  const authWrapper = document.getElementById('authWrapper');
+  const landingView = document.getElementById('landingView');
+  const loginView = document.getElementById('loginView');
+  const signupView = document.getElementById('signupView');
+  const loginForm = document.getElementById('loginForm');
+  const signupForm = document.getElementById('signupForm');
+  const loginMessageDiv = document.getElementById('loginMessage');
+  const signupMessageDiv = document.getElementById('signupMessage');
+
+  function showLoginMessage(text, isError = true) {
+    if (loginMessageDiv) {
+      loginMessageDiv.innerHTML = text;
+      loginMessageDiv.className = `message-area ${isError ? 'error-msg' : 'success-msg'}`;
+    }
+  }
+
+  function showSignupMessage(text, isError = true) {
+    if (signupMessageDiv) {
+      signupMessageDiv.innerHTML = text;
+      signupMessageDiv.className = `message-area ${isError ? 'error-msg' : 'success-msg'}`;
+    }
+  }
+
+  // update UI based on login state and hash
+  function updateUIBasedOnAuth() {
+    const loggedIn = isLoggedIn();
+    if (loggedIn) {
+      // show beautiful landing, hide auth card
+      authWrapper.style.display = 'none';
+      landingView.style.display = 'block';
+      
+      const sessionUser = getCurrentSessionUser();
+      const username = sessionUser ? sessionUser.username : 'User';
+      // update landing text fields
+      const landingUsernameSpan = document.getElementById('landingUsername');
+      const heroUserNameSpan = document.getElementById('heroUserName');
+      const userAvatarDiv = document.getElementById('userAvatar');
+      if (landingUsernameSpan) landingUsernameSpan.innerText = username;
+      if (heroUserNameSpan) heroUserNameSpan.innerText = username;
+      if (userAvatarDiv) userAvatarDiv.innerText = username.charAt(0).toUpperCase();
+    } else {
+      authWrapper.style.display = 'flex';
+      landingView.style.display = 'none';
+      // decide login or signup based on hash
+      const hash = window.location.hash;
+      if (hash === '#signup') {
+        loginView.style.display = 'none';
+        signupView.style.display = 'block';
+      } else {
+        loginView.style.display = 'block';
+        signupView.style.display = 'none';
+        if (window.location.hash !== '#login') window.location.hash = '#login';
+      }
+      clearAuthMessages();
+    }
+  }
+
+  function clearAuthMessages() {
+    if (loginMessageDiv) loginMessageDiv.innerHTML = '';
+    if (signupMessageDiv) signupMessageDiv.innerHTML = '';
+    if (loginMessageDiv) loginMessageDiv.className = 'message-area';
+    if (signupMessageDiv) signupMessageDiv.className = 'message-area';
+  }
+
+  // Login handler
+  function handleLogin(e) {
+    e.preventDefault();
+    if (isLoggedIn()) {
+      updateUIBasedOnAuth();
+      return;
+    }
+    const username = document.getElementById('loginUsername').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    if (!username || !password) {
+      showLoginMessage('❌ Please fill in both fields', true);
+      return;
+    }
+    if (validateUser(username, password)) {
+      setLoggedInUser(username);
+      document.getElementById('loginUsername').value = '';
+      document.getElementById('loginPassword').value = '';
+      showLoginMessage('✅ Login successful! Redirecting...', false);
+      updateUIBasedOnAuth();
+    } else {
+      showLoginMessage('❌ Invalid credentials. Try demo/demo123', true);
+    }
+  }
+
+  // Signup handler
+  function handleSignup(e) {
+    e.preventDefault();
+    if (isLoggedIn()) {
+      updateUIBasedOnAuth();
+      return;
+    }
+    const username = document.getElementById('signupUsername').value.trim();
+    const password = document.getElementById('signupPassword').value;
+    const confirm = document.getElementById('signupConfirm').value;
+    if (!username || !password || !confirm) {
+      showSignupMessage('⚠️ All fields required', true);
+      return;
+    }
+    if (password.length < 4) {
+      showSignupMessage('🔒 Password must be at least 4 characters', true);
+      return;
+    }
+    if (password !== confirm) {
+      showSignupMessage('❌ Passwords do not match', true);
+      return;
+    }
+    if (registeredUsers.some(u => u.username === username)) {
+      showSignupMessage(`⚠️ Username "${username}" already exists`, true);
+      return;
+    }
+    const added = addUser(username, password);
+    if (added) {
+      showSignupMessage('🎉 Account created! Redirect to login...', false);
+      document.getElementById('signupUsername').value = '';
+      document.getElementById('signupPassword').value = '';
+      document.getElementById('signupConfirm').value = '';
+      setTimeout(() => {
+        window.location.hash = '#login';
+        updateUIBasedOnAuth();
+      }, 1200);
+    } else {
+      showSignupMessage('⚠️ Signup error, try again', true);
+    }
+  }
+
+  // logout from landing
+  function logoutFromLanding() {
+    logoutUser();
+    window.location.hash = '#login';
+    updateUIBasedOnAuth();
+  }
+
+  // handle beautiful landing buttons with interactive toasts / alerts (dummy actions)
+  function attachLandingButtons() {
+    const buttons = document.querySelectorAll('.action-btn');
+    buttons.forEach(btn => {
+      btn.removeEventListener('click', handleButtonAction);
+      btn.addEventListener('click', handleButtonAction);
+    });
+    const logoutLanding = document.getElementById('logoutLandingBtn');
+    if (logoutLanding) {
+      logoutLanding.removeEventListener('click', logoutFromLanding);
+      logoutLanding.addEventListener('click', logoutFromLanding);
+    }
+  }
+
+  function handleButtonAction(e) {
+    const btn = e.currentTarget;
+    const action = btn.getAttribute('data-action') || 'action';
+    // create a small floating notification effect
+    const fakeToast = document.createElement('div');
+    fakeToast.innerText = `✨ ${action.charAt(0).toUpperCase() + action.slice(1)} clicked — demo interaction`;
+    fakeToast.style.position = 'fixed';
+    fakeToast.style.bottom = '20px';
+    fakeToast.style.left = '50%';
+    fakeToast.style.transform = 'translateX(-50%)';
+    fakeToast.style.backgroundColor = '#1e293b';
+    fakeToast.style.color = 'white';
+    fakeToast.style.padding = '10px 20px';
+    fakeToast.style.borderRadius = '40px';
+    fakeToast.style.fontSize = '0.85rem';
+    fakeToast.style.zIndex = '9999';
+    fakeToast.style.boxShadow = '0 8px 20px rgba(0,0,0,0.2)';
+    fakeToast.style.backdropFilter = 'blur(8px)';
+    document.body.appendChild(fakeToast);
+    setTimeout(() => {
+      fakeToast.style.opacity = '0';
+      setTimeout(() => fakeToast.remove(), 300);
+    }, 1800);
+  }
+
+  // hash change
+  function onHashChange() {
+    if (!isLoggedIn()) {
+      const hash = window.location.hash;
+      if (hash === '#signup') {
+        loginView.style.display = 'none';
+        signupView.style.display = 'block';
+      } else {
+        loginView.style.display = 'block';
+        signupView.style.display = 'none';
+      }
+      clearAuthMessages();
+    } else {
+      updateUIBasedOnAuth();
+    }
+  }
+
+  function init() {
+    loadUsersFromStorage();
+    loginForm.addEventListener('submit', handleLogin);
+    signupForm.addEventListener('submit', handleSignup);
+    const signupLink = document.getElementById('signupLinkNav');
+    const loginLink = document.getElementById('loginLinkNav');
+    if (signupLink) signupLink.addEventListener('click', (e) => { e.preventDefault(); window.location.hash = '#signup'; onHashChange(); });
+    if (loginLink) loginLink.addEventListener('click', (e) => { e.preventDefault(); window.location.hash = '#login'; onHashChange(); });
+    window.addEventListener('hashchange', onHashChange);
+    if (!window.location.hash || (window.location.hash !== '#login' && window.location.hash !== '#signup')) {
+      window.location.hash = '#login';
+    } else {
+      onHashChange();
+    }
+    updateUIBasedOnAuth();
+    // after each render we reattach landing buttons (observer not needed, we call after updates)
+    const observer = new MutationObserver(() => {
+      if (landingView.style.display === 'block') attachLandingButtons();
+    });
+    observer.observe(document.getElementById('appRoot'), { attributes: true, subtree: false, childList: true });
+    attachLandingButtons();
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
