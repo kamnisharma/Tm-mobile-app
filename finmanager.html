@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <title>FinManager - Mobile App</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #f2f4f8;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    #root {
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 36px;
+      box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+      min-height: 85vh;
+    }
+
+    .page-container {
+      padding: 24px 20px 32px;
+      animation: fadeSlideUp 0.25s ease-out;
+    }
+
+    @keyframes fadeSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    button {
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    button:active {
+      transform: scale(0.97);
+    }
+
+    .card-modern {
+      background: white;
+      border-radius: 28px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03), 0 2px 6px rgba(0, 0, 0, 0.05);
+      padding: 20px;
+      margin-bottom: 18px;
+      border: 1px solid rgba(0, 0, 0, 0.03);
+    }
+
+    .btn-primary {
+      background: #1e3c72;
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 44px;
+      font-weight: 600;
+      font-size: 1rem;
+      width: 100%;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #cbd5e1;
+      padding: 10px 16px;
+      border-radius: 40px;
+      font-weight: 500;
+    }
+
+    .grid-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 20px 0;
+    }
+    .cat-btn {
+      flex: 1 0 calc(33% - 12px);
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 12px 8px;
+      border-radius: 28px;
+      font-weight: 600;
+      text-align: center;
+      color: #1e293b;
+      font-size: 0.9rem;
+    }
+
+    .sub-btn {
+      background: white;
+      border: 1px solid #e2e8f0;
+      padding: 12px 14px;
+      border-radius: 60px;
+      font-weight: 500;
+      width: 100%;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 28px;
+      border: 1px solid #e2e8f0;
+      font-size: 0.95rem;
+      margin-bottom: 16px;
+      background: #fefefe;
+    }
+    .error-text {
+      color: #e53e3e;
+      font-size: 0.75rem;
+      margin-top: -10px;
+      margin-bottom: 12px;
+    }
+    .success-text {
+      color: #2c7a4b;
+    }
+    .flex-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logout-btn {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 40px;
+      font-weight: 500;
+    }
+    .back-link {
+      background: none;
+      border: none;
+      color: #1e3c72;
+      font-weight: 500;
+      margin-bottom: 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+    hr {
+      margin: 16px 0;
+    }
+    .transaction-item {
+      border-bottom: 1px solid #edf2f7;
+      padding: 12px 0;
+    }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.development.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.development.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/babel-standalone@6.26.0/babel.min.js"></script>
+
+<script type="text/babel">
+  const { useState, useEffect } = React;
+
+  // ---------- SIMPLE ROUTER ----------
+  const Route = ({ path, component, currentPath, onNavigate }) => {
+    if (currentPath === path) {
+      return component({ onNavigate });
+    }
+    return null;
+  };
+
+  // ---------- AUTH CONTEXT ----------
+  const useAuth = () => {
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+      const storedUser = localStorage.getItem('finmanager_user');
+      if (storedUser) setUser(JSON.parse(storedUser));
+      setLoading(false);
+    }, []);
+
+    const login = (email, password) => {
+      const users = JSON.parse(localStorage.getItem('finmanager_users') || '[]');
+      const found = users.find(u => u.email === email && u.password === password);
+      if (found) {
+        const loggedUser = { fullName: found.fullName, email: found.email };
+        setUser(loggedUser);
+        localStorage.setItem('finmanager_user', JSON.stringify(loggedUser));
+        return true;
+      }
+      return false;
+    };
+
+    const signup = (fullName, email, password) => {
+      const users = JSON.parse(localStorage.getItem('finmanager_users') || '[]');
+      if (users.find(u => u.email === email)) return false;
+      users.push({ fullName, email, password });
+      localStorage.setItem('finmanager_users', JSON.stringify(users));
+      return true;
+    };
+
+    const logout = () => {
+      setUser(null);
+      localStorage.removeItem('finmanager_user');
+    };
+
+    return { user, login, signup, logout, loading };
+  };
+
+  // ---------- TRANSACTION LOG COMPONENT ----------
+  const TransactionLog = ({ title, initialTransactions }) => {
+    const [search, setSearch] = useState('');
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
+    const [transactions] = useState(initialTransactions);
+
+    const filtered = transactions.filter(tx => {
+      const matchesSearch = tx.description.toLowerCase().includes(search.toLowerCase());
+      const txDate = tx.date;
+      if (startDate && txDate < startDate) return false;
+      if (endDate && txDate > endDate) return false;
+      return matchesSearch;
+    });
+
+    const exportCSV = () => {
+      let csvRows = [["Date", "Description", "Amount", "Type"]];
+      filtered.forEach(tx => csvRows.push([tx.date, tx.description, tx.amount, tx.type]));
+      const csvContent = csvRows.map(row => row.join(",")).join("\n");
+      const blob = new Blob([csvContent], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${title.replace(/\s/g, '_')}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    };
+
+    return (
+      <div className="card-modern">
+        <h3 style={{ marginBottom: 12 }}>{title}</h3>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
+          <input type="text" placeholder="Search description..." className="input-field" style={{ flex: 2, marginBottom: 0 }} value={search} onChange={e => setSearch(e.target.value)} />
+          <input type="date" className="input-field" style={{ flex: 1, marginBottom: 0 }} value={startDate} onChange={e => setStartDate(e.target.value)} />
+          <input type="date" className="input-field" style={{ flex: 1, marginBottom: 0 }} value={endDate} onChange={e => setEndDate(e.target.value)} />
+          <button onClick={exportCSV} className="btn-outline" style={{ background: '#eef2ff' }}>📎 Export CSV</button>
+        </div>
+        <div style={{ maxHeight: 380, overflowY: 'auto' }}>
+          {filtered.length === 0 && <div style={{ padding: 20, textAlign: 'center', color: '#94a3b8' }}>No records found</div>}
+          {filtered.map((tx, idx) => (
+            <div key={idx} className="transaction-item">
+              <div className="flex-between"><strong>{tx.date}</strong> <span style={{ fontWeight: 600, color: tx.amount.includes('-') ? '#b91c1c' : '#2c7a4b' }}>{tx.amount}</span></div>
+              <div style={{ fontSize: 14 }}>{tx.description}</div>
+              <div style={{ fontSize: 12, color: '#64748b' }}>{tx.type}</div>
+            </div>
+          ))}
+        </div>
+        <div className="flex-between" style={{ marginTop: 12, fontSize: 12 }}>✔ {filtered.length} entries • Reconcile effortlessly</div>
+      </div>
+    );
+  };
+
+  // ---------- MOCK DATA ----------
+  const expenseMock = [
+    { date: "2025-04-01", description: "Grocery shopping", amount: "-$85", type: "Payment" },
+    { date: "2025-04-03", description: "Netflix subscription", amount: "-$15", type: "Deposit" },
+    { date: "2025-04-05", description: "Electric bill", amount: "-$120", type: "Transfer" },
+  ];
+  const incomeMock = [
+    { date: "2025-04-02", description: "Salary deposit", amount: "+$2,500", type: "Receive" },
+    { date: "2025-04-04", description: "Freelance", amount: "+$350", type: "Other income" },
+  ];
+  const allTxMock = [...expenseMock, ...incomeMock];
+  const insightsMock = [
+    { date: "2025-04-01", description: "Coffee shop", amount: "-$5", type: "Spending" },
+    { date: "2025-04-02", description: "Salary", amount: "+$2500", type: "Income" },
+  ];
+
+  // ---------- PAGE COMPONENTS ----------
+  const LoginPage = ({ onNavigate }) => {
+    const { login } = useAuth();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      if (!email || !password) return setError('All fields required');
+      if (!/^\S+@\S+\.\S+$/.test(email)) return setError('Invalid email format');
+      if (login(email, password)) onNavigate('dashboard');
+      else setError('Invalid email or password');
+    };
+    return (
+      <div className="page-container">
+        <div className="card-modern" style={{ marginTop: 30 }}>
+          <h2 style={{ marginBottom: 20 }}>Welcome Back</h2>
+          <form onSubmit={handleSubmit}>
+            <input type="email" placeholder="Email address" className="input-field" value={email} onChange={e => setEmail(e.target.value)} />
+            <input type="password" placeholder="Password" className="input-field" value={password} onChange={e => setPassword(e.target.value)} />
+            {error && <div className="error-text">{error}</div>}
+            <button type="submit" className="btn-primary">Login →</button>
+            <div style={{ textAlign: 'center', marginTop: 20 }}>
+              <button style={{ color: '#1e3c72', textDecoration: 'none', background: 'none', border: 'none', cursor: 'pointer' }} onClick={() => onNavigate('signup')}>Create account → Sign up</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  };
+
+  const SignupPage = ({ onNavigate }) => {
+    const { signup } = useAuth();
+    const [fullName, setFullName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirm, setConfirm] = useState('');
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
+
+    const handleSignup = (e) => {
+      e.preventDefault();
+      if (!fullName || !email || !password) return setError('All fields required');
+      if (password.length < 6) return setError('Password must be at least 6 characters');
+      if (password !== confirm) return setError('Passwords do not match');
+      if (!/^\S+@\S+\.\S+$/.test(email)) return setError('Invalid email');
+      if (signup(fullName, email, password)) {
+        setSuccess('Account created! Redirecting to login...');
+        setTimeout(() => onNavigate('login'), 1500);
+      } else setError('Email already exists');
+    };
+    return (
+      <div className="page-container">
+        <div className="card-modern">
+          <h2>Join FinManager</h2>
+          <form onSubmit={handleSignup}>
+            <input placeholder="Full Name" className="input-field" value={fullName} onChange={e => setFullName(e.target.value)} />
+            <input placeholder="Email" className="input-field" value={email} onChange={e => setEmail(e.target.value)} />
+            <input type="password" placeholder="Password (min 6)" className="input-field" value={password} onChange={e => setPassword(e.target.value)} />
+            <input type="password" placeholder="Confirm Password" className="input-field" value={confirm} onChange={e => setConfirm(e.target.value)} />
+            {error && <div className="error-text">{error}</div>}
+            {success && <div className="success-text">{success}</div>}
+            <button type="submit" className="btn-primary">Sign Up</button>
+            <div style={{ marginTop: 16, textAlign: 'center' }}>
+              <button style={{ color: '#1e3c72', background: 'none', border: 'none', cursor: 'pointer' }} onClick={() => onNavigate('login')}>← Back to Login</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  };
+
+  const Dashboard = ({ onNavigate }) => {
+    const { user, logout } = useAuth();
+    const categories = [
+      { name: 'cash', label: '💰 Cash', path: 'cash' },
+      { name: 'sims', label: '📱 Sims', path: 'sims' },
+      { name: 'mobiles', label: '📲 Mobiles', path: 'mobiles' },
+      { name: 'bank', label: '🏦 Bank', path: 'bank' },
+      { name: 'property', label: '🏠 Property', path: 'property' },
+      { name: 'notes', label: '📝 Notes', path: 'notes' }
+    ];
+    return (
+      <div className="page-container">
+        <div className="flex-between" style={{ marginBottom: 20 }}>
+          <h2>FinManager</h2>
+          <button onClick={() => { logout(); onNavigate('login'); }} className="logout-btn">Logout</button>
+        </div>
+        <div className="card-modern">
+          <p style={{ fontSize: '1.2rem', fontWeight: 500 }}>👋 Welcome, {user?.fullName || 'User'}!</p>
+          <p style={{ color: '#475569', marginTop: 6 }}>Smart money, smart life.</p>
+        </div>
+        <div className="grid-buttons">
+          {categories.map(cat => <button key={cat.name} onClick={() => onNavigate(cat.path)} className="cat-btn">{cat.label}</button>)}
+        </div>
+      </div>
+    );
+  };
+
+  // Cash page and subpages
+  const CashPage = ({ onNavigate }) => {
+    const actions = [
+      { name: 'Track your expenses', path: 'cash_expenses', emoji: '📉' },
+      { name: 'Income streams', path: 'cash_income', emoji: '📈' },
+      { name: 'Real-time cash insights', path: 'cash_insights', emoji: '⚡' },
+      { name: 'Transaction history', path: 'cash_history', emoji: '📜' },
+      { name: 'Budgeting goals', path: 'cash_budget', emoji: '🎯' },
+      { name: 'Enter Income', path: 'cash_enter_income', emoji: '➕' },
+    ];
+    return (
+      <div className="page-container">
+        <button className="back-link" onClick={() => onNavigate('dashboard')}>← Dashboard</button>
+        <h2>💰 Cash Hub</h2>
+        <div style={{ marginTop: 18, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {actions.map(act => <button key={act.name} className="sub-btn" onClick={() => onNavigate(act.path)}><span>{act.emoji}</span> {act.name}</button>)}
+        </div>
+      </div>
+    );
+  };
+
+  const ExpensesDetail = ({ onNavigate }) => (<div className="page-container"><button className="back-link" onClick={() => onNavigate('cash')}>← Back</button><TransactionLog title="Expenses Detail" initialTransactions={expenseMock} /></div>);
+  const IncomeStreams = ({ onNavigate }) => (<div className="page-container"><button className="back-link" onClick={() => onNavigate('cash')}>← Back</button><TransactionLog title="Income Streams" initialTransactions={incomeMock} /></div>);
+  const TransactionHistoryComp = ({ onNavigate }) => (<div className="page-container"><button className="back-link" onClick={() => onNavigate('cash')}>← Back</button><TransactionLog title="Transaction History" initialTransactions={allTxMock} /></div>);
+  const RealTimeInsights = ({ onNavigate }) => (<div className="page-container"><button className="back-link" onClick={() => onNavigate('cash')}>← Back</button><div className="card-modern"><h3>Real‑time Cash Insights</h3><p>📊 Live dashboard with spending patterns & instant notifications</p><div style={{ background: '#f1f5f9', borderRadius: 20, padding: 12, margin: '12px 0' }}><p>🔔 Weekly spend +12% vs last week</p><p>🍕 Top category: Dining ($210)</p></div><TransactionLog title="Spending patterns" initialTransactions={insightsMock} /></div></div>);
+  
+  const BudgetingGoals = ({ onNavigate }) => {
+    const [entries, setEntries] = useState([]);
+    const [date, setDate] = useState(''); const [desc, setDesc] = useState(''); const [amount, setAmount] = useState('');
+    const addEntry = () => { if(date && desc && amount) setEntries([...entries, { date, desc, amount }]); setDate(''); setDesc(''); setAmount(''); };
+    return (<div className="page-container"><button className="back-link" onClick={() => onNavigate('cash')}>← Back</button><div className="card-modern"><h3>Budgeting Goals - Add Expense</h3><input type="date" className="input-field" value={date} onChange={e=>setDate(e.target.value)}/><input placeholder="Description" className="input-field" value={desc} onChange={e=>setDesc(e.target.value)}/><input placeholder="Amount" className="input-field" value={amount} onChange={e=>setAmount(e.target.value)}/><button onClick={addEntry} className="btn-primary">Add Expense</button><hr/><h4>Recent Expenses</h4>{entries.map((e,i)=><div key={i} className="transaction-item">{e.date} - {e.desc} : {e.amount}</div>)}</div></div>);
+  };
+  
+  const EnterIncomeForm = ({ onNavigate }) => {
+    const [entries, setEntries] = useState([]);
+    const [date, setDate] = useState(''); const [desc, setDesc] = useState(''); const [amount, setAmount] = useState('');
+    const add = () => { if(date && desc && amount) setEntries([...entries, { date, desc, amount }]); setDate(''); setDesc(''); setAmount(''); };
+    return (<div className="page-container"><button className="back-link" onClick={() => onNavigate('cash')}>← Back</button><div className="card-modern"><h3>Enter Income</h3><input type="date" className="input-field" value={date} onChange={e=>setDate(e.target.value)}/><input placeholder="Description" className="input-field" value={desc} onChange={e=>setDesc(e.target.value)}/><input placeholder="Amount" className="input-field" value={amount} onChange={e=>setAmount(e.target.value)}/><button onClick={add} className="btn-primary">Add Income</button><hr/><h4>Income entries</h4>{entries.map((e,i)=><div key={i}>{e.date} {e.desc} +{e.amount}</div>)}</div></div>);
+  };
+
+  // Sims, Mobiles, Bank, Property, Notes
+  const SimsPage = ({ onNavigate }) => (<div className="page-container"><button className="back-link" onClick={()=>onNavigate('dashboard')}>← Dashboard</button><h2>📱 SIM Management</h2><div className="grid-buttons"><button className="cat-btn" onClick={()=>onNavigate('sims_issue')}>📌 Sims Issue</button><button className="cat-btn" onClick={()=>onNavigate('sims_stock')}>📦 Sims Stock</button></div></div>);
+  const SimsIssue = ({ onNavigate }) => (<div className="page-container"><button className="back-link" onClick={()=>onNavigate('sims')}>← Back</button><div className="card-modern"><h3>Sims Issue Requests</h3><ul><li>+92300123456 - Pending</li><li>+92333111222 - Approved</li><li>+92345555666 - Replacement</li></ul></div></div>);
+  const SimsStock = ({ onNavigate }) => (<div className="page-container"><button className="back-link" onClick={()=>onNavigate('sims')}>← Back</button><div className="card-modern"><h3>SIM Stock Inventory</h3><p>Jazz: 45 units | Zong: 32 | Telenor: 21 | Ufone: 18</p></div></div>);
+  
+  const MobilesPage = ({ onNavigate }) => (<div className="page-container"><button className="back-link" onClick={()=>onNavigate('dashboard')}>← Dashboard</button><h2>📱 Mobiles</h2><div className="grid-buttons"><button className="cat-btn" onClick={()=>onNavigate('mobiles_name')}>📱 Mobile Name</button><button className="cat-btn" onClick={()=>onNavigate('mobiles_company')}>🏭 Company</button><button className="cat-btn" onClick={()=>onNavigate('mobiles_imei')}>🔢 IMEI</button></div></div>);
+  const MobileName = ({ onNavigate }) => (<div className="page-container"><button className="back-link" onClick={()=>onNavigate('mobiles')}>← Back</button><div className="card-modern"><h3>Mobile Models</h3><p>iPhone 15 Pro, Samsung S24, Pixel 8, Xiaomi 13T</p></div></div>);
+  const MobileCompany = ({ onNavigate }) => (<div className="page-container"><button className="back-link" onClick={()=>onNavigate('mobiles')}>← Back</button><div className="card-modern"><h3>Companies</h3><p>Apple, Samsung, Google, OnePlus, Nokia</p></div></div>);
+  const MobileIMEI = ({ onNavigate }) => (<div className="page-container"><button className="back-link" onClick={()=>onNavigate('mobiles')}>← Back</button><div className="card-modern"><h3>IMEI Database</h3><p>356123456789012, 490154203237518, 352113106745982</p></div></div>);
+  
+  const BankPage = ({ onNavigate }) => {
+    const banks = ['Alfalah Bank', 'Meezan Bank', 'HBL Bank', 'Habib Bank', 'National Bank', 'New Bank'];
+    return (<div className="page-container"><button className="back-link" onClick={()=>onNavigate('dashboard')}>← Dashboard</button><h2>🏦 Banking</h2><div className="grid-buttons">{banks.map(b=> <button key={b} className="cat-btn" onClick={()=>onNavigate(`bank_${b.replace(/\s/g,'')}`)}>{b}</button>)}</div></div>);
+  };
+  const BankDetail = ({ onNavigate, bankName }) => (<div className="page-container"><button className="back-link" onClick={()=>onNavigate('bank')}>← Banks</button><div className="card-modern"><h3>{bankName}</h3><p>Account: ****3456<br/>Balance: $12,450<br/>Last transaction: 04/10/2025</p></div></div>);
+  
+  const PropertyPage = ({ onNavigate }) => (<div className="page-container"><button className="back-link" onClick={()=>onNavigate('dashboard')}>← Dashboard</button><div className="card-modern"><h3>🏠 Property Portfolio</h3><p>• Downtown Apartment - $250k<br/>• Commercial Plaza - $1.2M<br/>• Lake House - $490k</p></div></div>);
+  const NotesPage = ({ onNavigate }) => {
+    const [notes, setNotes] = useState([]); const [noteText, setNoteText] = useState('');
+    const addNote = () => { if(noteText.trim()) setNotes([...notes, noteText]); setNoteText(''); };
+    return (<div className="page-container"><button className="back-link" onClick={()=>onNavigate('dashboard')}>← Dashboard</button><div className="card-modern"><h3>📝 Quick Notes</h3><input className="input-field" placeholder="Write note..." value={noteText} onChange={e=>setNoteText(e.target.value)}/><button onClick={addNote} className="btn-primary">Add Note</button><ul style={{marginTop:12}}>{notes.map((n,i)=><li key={i}>{n}</li>)}</ul></div></div>);
+  };
+
+  // Main App Component
+  const App = () => {
+    const [currentPage, setCurrentPage] = useState('login');
+    const { user, loading } = useAuth();
+    const [bankParam, setBankParam] = useState('');
+
+    useEffect(() => {
+      if (!loading && user && currentPage === 'login') setCurrentPage('dashboard');
+      if (!loading && !user && currentPage !== 'login' && currentPage !== 'signup') setCurrentPage('login');
+    }, [user, loading, currentPage]);
+
+    const navigate = (page, param = null) => {
+      if (param) setBankParam(param);
+      setCurrentPage(page);
+    };
+
+    if (loading) return <div className="page-container">Loading...</div>;
+
+    // Route mapping
+    if (currentPage === 'login') return <LoginPage onNavigate={navigate} />;
+    if (currentPage === 'signup') return <SignupPage onNavigate={navigate} />;
+    if (currentPage === 'dashboard') return <Dashboard onNavigate={navigate} />;
+    if (currentPage === 'cash') return <CashPage onNavigate={navigate} />;
+    if (currentPage === 'cash_expenses') return <ExpensesDetail onNavigate={navigate} />;
+    if (currentPage === 'cash_income') return <IncomeStreams onNavigate={navigate} />;
+    if (currentPage === 'cash_history') return <TransactionHistoryComp onNavigate={navigate} />;
+    if (currentPage === 'cash_insights') return <RealTimeInsights onNavigate={navigate} />;
+    if (currentPage === 'cash_budget') return <BudgetingGoals onNavigate={navigate} />;
+    if (currentPage === 'cash_enter_income') return <EnterIncomeForm onNavigate={navigate} />;
+    if (currentPage === 'sims') return <SimsPage onNavigate={navigate} />;
+    if (currentPage === 'sims_issue') return <SimsIssue onNavigate={navigate} />;
+    if (currentPage === 'sims_stock') return <SimsStock onNavigate={navigate} />;
+    if (currentPage === 'mobiles') return <MobilesPage onNavigate={navigate} />;
+    if (currentPage === 'mobiles_name') return <MobileName onNavigate={navigate} />;
+    if (currentPage === 'mobiles_company') return <MobileCompany onNavigate={navigate} />;
+    if (currentPage === 'mobiles_imei') return <MobileIMEI onNavigate={navigate} />;
+    if (currentPage === 'bank') return <BankPage onNavigate={navigate} />;
+    if (currentPage.startsWith('bank_')) return <BankDetail onNavigate={navigate} bankName={currentPage.replace('bank_', '')} />;
+    if (currentPage === 'property') return <PropertyPage onNavigate={navigate} />;
+    if (currentPage === 'notes') return <NotesPage onNavigate={navigate} />;
+    
+    return <LoginPage onNavigate={navigate} />;
+  };
+
+  ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
