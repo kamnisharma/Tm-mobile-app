@@ -1,0 +1,934 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+  <title>FlowSpace — Complete Finance Suite</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, 'Segoe UI', 'Inter', Roboto, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f4f7fc 0%, #e9eef4 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .app-mobile {
+      max-width: 400px;
+      width: 100%;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.98);
+      border-radius: 48px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+
+    .page {
+      display: none;
+      padding: 28px 22px 36px;
+      animation: fadeSlide 0.3s ease;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(120deg, #1F2A44, #2C3E66);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 6px;
+    }
+
+    .subhead {
+      font-size: 0.85rem;
+      color: #5a6e8a;
+      margin-bottom: 28px;
+      border-left: 3px solid #3b82f6;
+      padding-left: 12px;
+    }
+
+    .input-field {
+      margin-bottom: 18px;
+    }
+
+    label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 14px 18px;
+      font-size: 0.95rem;
+      border: 1.5px solid #e2edf7;
+      border-radius: 34px;
+      background: #ffffff;
+      transition: all 0.2s;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      background: #1e2a3e;
+      border: none;
+      border-radius: 44px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: white;
+      cursor: pointer;
+      transition: 0.2s;
+      margin-top: 8px;
+    }
+
+    .btn-primary {
+      background: #3b82f6;
+      box-shadow: 0 8px 18px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-primary:hover {
+      background: #2563eb;
+      transform: scale(0.97);
+    }
+
+    .btn-secondary {
+      background: #10b981;
+    }
+    .btn-secondary:hover {
+      background: #059669;
+    }
+
+    .error-msg, .success-msg {
+      font-size: 0.75rem;
+      padding: 8px 14px;
+      border-radius: 28px;
+      margin-top: 10px;
+      text-align: center;
+      display: none;
+    }
+
+    .error-msg { background: #fee2e2; color: #b91c1c; }
+    .success-msg { background: #dcfce7; color: #15803d; }
+
+    .link-row {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.85rem;
+    }
+
+    .link-row a {
+      color: #3b82f6;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    /* Dashboard */
+    .dash-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .app-logo {
+      font-size: 1.7rem;
+      font-weight: 800;
+      background: linear-gradient(130deg, #0f2b3d, #1e4a76);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .logout-icon {
+      background: #f1f5f9;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 40px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .welcome-card {
+      background: #f8fafd;
+      padding: 14px 18px;
+      border-radius: 32px;
+      margin-bottom: 24px;
+      border: 1px solid #eef2ff;
+    }
+
+    .cards-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .info-card {
+      flex: 1;
+      background: white;
+      border-radius: 28px;
+      padding: 16px 12px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+      border: 1px solid #eef2ff;
+    }
+
+    .info-card h4 { font-size: 0.9rem; font-weight: 800; margin-bottom: 8px; }
+    .info-card p { font-size: 0.7rem; color: #5a6e8a; }
+
+    .six-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 20px 0;
+    }
+
+    .cat-action {
+      background: #f1f5f9;
+      border: none;
+      padding: 12px 6px;
+      border-radius: 38px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .cat-action:hover {
+      background: #e0e7ff;
+      transform: translateY(-3px);
+    }
+
+    /* Category detail page */
+    .back-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .back-btn {
+      background: #f1f5f9;
+      border: none;
+      width: 44px;
+      height: 44px;
+      border-radius: 40px;
+      font-size: 1.4rem;
+      cursor: pointer;
+    }
+
+    .category-heading {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #1e293b;
+      margin-bottom: 12px;
+    }
+
+    .category-desc {
+      background: #fefce8;
+      padding: 20px;
+      border-radius: 32px;
+      margin-top: 20px;
+      border-left: 8px solid #f97316;
+    }
+
+    .sub-buttons-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 20px 0 10px;
+    }
+
+    .sub-cat-btn {
+      background: white;
+      border: 1px solid #cbd5e1;
+      padding: 8px 14px;
+      border-radius: 40px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .sub-cat-btn:hover {
+      background: #eef2ff;
+      transform: translateY(-2px);
+    }
+
+    /* Sub detail page (transaction logs, insights, budget form, income form) */
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .filter-bar input, .filter-bar select {
+      flex: 1;
+      padding: 10px 12px;
+      border-radius: 30px;
+      border: 1px solid #cbd5e1;
+      font-size: 0.8rem;
+    }
+    .transaction-table {
+      width: 100%;
+      font-size: 0.7rem;
+      border-collapse: collapse;
+    }
+    .transaction-table th, .transaction-table td {
+      padding: 8px 4px;
+      border-bottom: 1px solid #e2e8f0;
+      text-align: left;
+    }
+    .export-btn {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 30px;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+    .insight-card {
+      background: #f0f9ff;
+      padding: 16px;
+      border-radius: 24px;
+      margin-bottom: 16px;
+      border-left: 4px solid #3b82f6;
+    }
+    .expense-item, .income-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f8fafc;
+      padding: 10px;
+      border-radius: 20px;
+      margin-bottom: 8px;
+    }
+    .delete-item {
+      background: #fee2e2;
+      border: none;
+      padding: 4px 10px;
+      border-radius: 30px;
+      color: #b91c1c;
+      cursor: pointer;
+    }
+    hr { margin: 15px 0; }
+  </style>
+</head>
+<body>
+<div class="app-mobile">
+  <!-- LOGIN, SIGNUP, DASHBOARD -->
+  <div id="loginPage" class="page">
+    <h1>Welcome back</h1>
+    <div class="subhead">Sign in to your account</div>
+    <div class="input-field"><label>Email</label><input type="email" id="loginEmail" placeholder="hello@domain.com"></div>
+    <div class="input-field"><label>Password</label><input type="password" id="loginPassword" placeholder="••••••"></div>
+    <button class="btn btn-primary" id="loginBtn">Login →</button>
+    <div id="loginErrorMsg" class="error-msg"></div>
+    <div class="link-row">New here? <a href="#" id="toSignupLink">Sign up</a></div>
+  </div>
+
+  <div id="signupPage" class="page">
+    <h1>Create account</h1>
+    <div class="subhead">Join the community</div>
+    <div class="input-field"><label>Full Name</label><input type="text" id="signupName"></div>
+    <div class="input-field"><label>Email</label><input type="email" id="signupEmail"></div>
+    <div class="input-field"><label>Password (min 6)</label><input type="password" id="signupPassword"></div>
+    <div class="input-field"><label>Confirm Password</label><input type="password" id="signupConfirm"></div>
+    <button class="btn btn-primary" id="signupBtn">Sign Up →</button>
+    <div id="signupErrorMsg" class="error-msg"></div>
+    <div id="signupSuccessMsg" class="success-msg"></div>
+    <div class="link-row">Already have an account? <a href="#" id="toLoginLink">Login</a></div>
+  </div>
+
+  <div id="dashboardPage" class="page">
+    <div class="dash-header"><div class="app-logo">T M Digital</div><button class="logout-icon" id="logoutBtn">Logout</button></div>
+    <div class="welcome-card"><h3 id="welcomeUserMsg">Welcome, User</h3></div>
+  <div class="six-grid" id="categoryButtons">
+      <button class="cat-action" data-category="cash">💰 Cash</button>
+      <button class="cat-action" data-category="sims">📱 Sims</button>
+      <button class="cat-action" data-category="mobiles">📲 Mobiles</button>
+      <button class="cat-action" data-category="bank">🏦 Banks</button>
+      <button class="cat-action" data-category="property">🏠 Property</button>
+      <button class="cat-action" data-category="notes">📝 Notes</button>
+    </div>
+  </div>
+    <div class="cards-row">
+      <div class="info-card"><h4>👤 Profile</h4><p id="profileNameDisplay">Name: --</p><p id="profileEmailDisplay">Email: --</p></div>
+      <div class="info-card"><h4>⚙️ Settings</h4><p>Theme, Notifications</p></div>
+      <div class="info-card"><h4>📈 Activity</h4><p>Last login: today</p></div>
+    </div>
+  
+
+  <!-- Category main page (dynamic) -->
+  <div id="categoryPage" class="page">
+    <div class="back-bar"><button class="back-btn" id="backToDashboardBtn">←</button><span style="font-weight:500;">Category</span></div>
+    <div id="categoryDynamicHeading" class="category-heading">✨ Overview</div>
+    <p id="categorySubInfo" style="color:#4b5563; margin-bottom:10px;">Insights and tools</p>
+    <div id="subButtonsContainer" class="sub-buttons-container"></div>
+    <div class="category-desc" id="categoryDetailedDesc">Explore this section.</div>
+  </div>
+
+  <!-- Sub detail page (for expenses, income, insights, transaction history, budget form, income form) -->
+  <div id="subDetailPage" class="page">
+    <div class="back-bar"><button class="back-btn" id="backToCategoryBtn">←</button><span>Detail</span></div>
+    <div id="subDetailHeading" class="category-heading">Detail View</div>
+    <div id="subDetailContent"></div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // ---------- AUTH & STORAGE ----------
+    const USERS_KEY = "flow_users";
+    const SESSION_KEY = "flow_session";
+    function getUsers() { return JSON.parse(localStorage.getItem(USERS_KEY) || "[]"); }
+    function saveUsers(u) { localStorage.setItem(USERS_KEY, JSON.stringify(u)); }
+    function getSession() { return JSON.parse(localStorage.getItem(SESSION_KEY) || "null"); }
+    function setSession(u) { u ? localStorage.setItem(SESSION_KEY, JSON.stringify(u)) : localStorage.removeItem(SESSION_KEY); }
+    function seedDemo() { if(getUsers().length===0) saveUsers([{fullName:"Alex Rivera", email:"demo@flow.com", password:"demo123"}]); }
+    function isValidEmail(e) { return /^[^\s@]+@([^\s@]+\.)+[^\s@]+$/.test(e); }
+
+    // Pages
+    const pages = {
+      login: document.getElementById('loginPage'),
+      signup: document.getElementById('signupPage'),
+      dashboard: document.getElementById('dashboardPage'),
+      category: document.getElementById('categoryPage'),
+      subDetail: document.getElementById('subDetailPage')
+    };
+    function showPage(name) { Object.keys(pages).forEach(p => pages[p].classList.remove('active')); pages[name].classList.add('active'); }
+
+    let currentCategory = null;
+
+    // Refresh dashboard UI
+    function refreshDashboard() {
+      const s = getSession();
+      if(s) {
+        document.getElementById('welcomeUserMsg').innerText = `Welcome, ${s.fullName} ✨`;
+        document.getElementById('profileNameDisplay').innerText = `Name: ${s.fullName}`;
+        document.getElementById('profileEmailDisplay').innerText = `Email: ${s.email}`;
+      }
+    }
+
+    // Helper: Show Sub Detail Page with content
+    function showSubDetail(title, contentHTML) {
+      document.getElementById('subDetailHeading').innerText = title;
+      document.getElementById('subDetailContent').innerHTML = contentHTML;
+      showPage('subDetail');
+    }
+
+    // ---------- BUDGETING GOALS: Expense Entry Form & List ----------
+    function getExpensesKey() {
+      const user = getSession();
+      if(!user) return null;
+      return `budget_expenses_${user.email}`;
+    }
+    function loadExpenses() {
+      const key = getExpensesKey();
+      if(!key) return [];
+      const data = localStorage.getItem(key);
+      return data ? JSON.parse(data) : [];
+    }
+    function saveExpenses(expenses) {
+      const key = getExpensesKey();
+      if(key) localStorage.setItem(key, JSON.stringify(expenses));
+    }
+    function addExpense(date, description, amount) {
+      const expenses = loadExpenses();
+      expenses.push({ id: Date.now(), date, description, amount: parseFloat(amount) });
+      saveExpenses(expenses);
+    }
+    function deleteExpense(id) {
+      let expenses = loadExpenses();
+      expenses = expenses.filter(exp => exp.id !== id);
+      saveExpenses(expenses);
+    }
+
+    // Render Budgeting Goals page (Expense entry)
+    function showBudgetingGoals() {
+      const renderBudgetPage = () => {
+        const expenses = loadExpenses();
+        const totalAmount = expenses.reduce((sum, e) => sum + e.amount, 0);
+        const expensesListHtml = expenses.length === 0 ? 
+          '<p style="text-align:center; color:#6b7280;">No expenses added yet. Use the form above.</p>' :
+          expenses.map(exp => `
+            <div class="expense-item">
+              <div><strong>${exp.date}</strong><br>${exp.description}</div>
+              <div>$${exp.amount.toFixed(2)} 
+                <button class="delete-item" data-id="${exp.id}">✖</button>
+              </div>
+            </div>
+          `).join('');
+        return `
+          <div style="margin-bottom: 24px;">
+            <h3 style="font-size:0.7rem;">➕ Add New Expense</h3>
+            <div class="input-field"><label>Date</label><input type="date" id="expenseDate" /></div>
+            <div class="input-field"><label>Description</label><input type="text" id="expenseDesc" placeholder="e.g., Groceries, Rent" /></div>
+            <div class="input-field"><label>Amount (Rs.)</label><input type="number" id="expenseAmount" step="0.01" placeholder="0.00" /></div>
+            <button class="btn btn-secondary" id="addExpenseBtn">➕ Add Expense</button>
+            <div id="budgetFormMsg" class="success-msg" style="display:none;"></div>
+          </div>
+          <hr />
+<div style="margin-top: 16px; background:#eef2ff; padding:12px; border-radius:24px;">
+            <strong>Total Spent:</strong> $${totalAmount.toFixed(2)}
+          </div>
+          <h3 style="font-size:1.2rem;">📋 Expense List (Budget Tracking)</h3>
+          <div id="expensesListContainer">${expensesListHtml}</div>
+          
+          <p style="font-size:0.7rem; margin-top:12px;">🎯 Set budgeting goals by tracking every expense.</p>
+        `;
+      };
+      const refreshBudgetView = () => {
+        const container = document.getElementById('subDetailContent');
+        if(container) container.innerHTML = renderBudgetPage();
+        attachBudgetEvents();
+      };
+      const attachBudgetEvents = () => {
+        const addBtn = document.getElementById('addExpenseBtn');
+        if(addBtn) {
+          addBtn.onclick = () => {
+            const date = document.getElementById('expenseDate').value;
+            const desc = document.getElementById('expenseDesc').value.trim();
+            const amount = parseFloat(document.getElementById('expenseAmount').value);
+            const msgDiv = document.getElementById('budgetFormMsg');
+            if(!date || !desc || isNaN(amount) || amount <= 0) {
+              msgDiv.style.display = 'block';
+              msgDiv.className = 'error-msg';
+              msgDiv.innerText = '❌ Please fill all fields with valid amount (>0)';
+              setTimeout(() => msgDiv.style.display = 'none', 2000);
+              return;
+            }
+            addExpense(date, desc, amount);
+            msgDiv.style.display = 'block';
+            msgDiv.className = 'success-msg';
+            msgDiv.innerText = '✅ Expense added!';
+            setTimeout(() => msgDiv.style.display = 'none', 1500);
+            document.getElementById('expenseDate').value = '';
+            document.getElementById('expenseDesc').value = '';
+            document.getElementById('expenseAmount').value = '';
+            refreshBudgetView();
+          };
+        }
+        document.querySelectorAll('.delete-item').forEach(btn => {
+          btn.onclick = () => {
+            const id = parseInt(btn.getAttribute('data-id'));
+            deleteExpense(id);
+            refreshBudgetView();
+          };
+        });
+      };
+      showSubDetail("🎯 Budgeting Goals", renderBudgetPage());
+      setTimeout(() => attachBudgetEvents(), 10);
+    }
+
+    // ---------- ENTER INCOME: Income Entry Form & List ----------
+    function getIncomesKey() {
+      const user = getSession();
+      if(!user) return null;
+      return `budget_incomes_${user.email}`;
+    }
+    function loadIncomes() {
+      const key = getIncomesKey();
+      if(!key) return [];
+      const data = localStorage.getItem(key);
+      return data ? JSON.parse(data) : [];
+    }
+    function saveIncomes(incomes) {
+      const key = getIncomesKey();
+      if(key) localStorage.setItem(key, JSON.stringify(incomes));
+    }
+    function addIncome(date, description, amount) {
+      const incomes = loadIncomes();
+      incomes.push({ id: Date.now(), date, description, amount: parseFloat(amount) });
+      saveIncomes(incomes);
+    }
+    function deleteIncome(id) {
+      let incomes = loadIncomes();
+      incomes = incomes.filter(inc => inc.id !== id);
+      saveIncomes(incomes);
+    }
+
+    function showEnterIncome() {
+      const renderIncomePage = () => {
+        const incomes = loadIncomes();
+        const totalIncome = incomes.reduce((sum, inc) => sum + inc.amount, 0);
+        const incomesListHtml = incomes.length === 0 ?
+          '<p style="text-align:center; color:#6b7280;">No income entries yet. Use the form above.</p>' :
+          incomes.map(inc => `
+            <div class="expense-item">
+              <div><strong>${inc.date}</strong><br>${inc.description}</div>
+              <div>+$${inc.amount.toFixed(2)} 
+                <button class="delete-item" data-id="${inc.id}">✖</button>
+              </div>
+            </div>
+          `).join('');
+        return `
+          <div style="margin-bottom: 24px;">
+            <h3 style="font-size:1.2rem;">💰 Add New Income</h3>
+            <div class="input-field"><label>Date</label><input type="date" id="incomeDate" /></div>
+            <div class="input-field"><label>Description</label><input type="text" id="incomeDesc" placeholder="e.g., Salary, Freelance, Gift" /></div>
+            <div class="input-field"><label>Amount ($)</label><input type="number" id="incomeAmount" step="0.01" placeholder="0.00" /></div>
+            <button class="btn btn-secondary" id="addIncomeBtn">➕ Add Income</button>
+            <div id="incomeFormMsg" class="success-msg" style="display:none;"></div>
+          </div>
+          <hr />
+          <h3 style="font-size:1.2rem;">📊 Income History</h3>
+          <div id="incomesListContainer">${incomesListHtml}</div>
+          <div style="margin-top: 16px; background:#eef2ff; padding:12px; border-radius:24px;">
+            <strong>Total Income:</strong> $${totalIncome.toFixed(2)}
+          </div>
+          <p style="font-size:0.7rem; margin-top:12px;">📈 Track all your income sources easily.</p>
+        `;
+      };
+      const refreshIncomeView = () => {
+        const container = document.getElementById('subDetailContent');
+        if(container) container.innerHTML = renderIncomePage();
+        attachIncomeEvents();
+      };
+      const attachIncomeEvents = () => {
+        const addBtn = document.getElementById('addIncomeBtn');
+        if(addBtn) {
+          addBtn.onclick = () => {
+            const date = document.getElementById('incomeDate').value;
+            const desc = document.getElementById('incomeDesc').value.trim();
+            const amount = parseFloat(document.getElementById('incomeAmount').value);
+            const msgDiv = document.getElementById('incomeFormMsg');
+            if(!date || !desc || isNaN(amount) || amount <= 0) {
+              msgDiv.style.display = 'block';
+              msgDiv.className = 'error-msg';
+              msgDiv.innerText = '❌ Please fill all fields with valid amount (>0)';
+              setTimeout(() => msgDiv.style.display = 'none', 2000);
+              return;
+            }
+            addIncome(date, desc, amount);
+            msgDiv.style.display = 'block';
+            msgDiv.className = 'success-msg';
+            msgDiv.innerText = '✅ Income added!';
+            setTimeout(() => msgDiv.style.display = 'none', 1500);
+            document.getElementById('incomeDate').value = '';
+            document.getElementById('incomeDesc').value = '';
+            document.getElementById('incomeAmount').value = '';
+            refreshIncomeView();
+          };
+        }
+        document.querySelectorAll('.delete-item').forEach(btn => {
+          btn.onclick = () => {
+            const id = parseInt(btn.getAttribute('data-id'));
+            deleteIncome(id);
+            refreshIncomeView();
+          };
+        });
+      };
+      showSubDetail("💰 Enter Income", renderIncomePage());
+      setTimeout(() => attachIncomeEvents(), 10);
+    }
+
+    // ---------- Other Cash sub-functions (filterable tables) ----------
+    function renderFilterableTable(initialData, titlePrefix, placeholderText) {
+      let currentData = [...initialData];
+      const containerId = 'filterableTable_' + Date.now();
+      const filterInputId = `search_${Date.now()}`;
+      const dateFilterId = `date_${Date.now()}`;
+
+      function renderTable(filtered) {
+        let rows = filtered.map(item => `
+          <tr>
+            <td>${item.date}</td>
+            <td>${item.description}</td>
+            <td>${item.type}</td>
+            <td>${item.amount}</td>
+          </tr>
+        `).join('');
+        return `<table class="transaction-table"><thead><tr><th>Date</th><th>Description</th><th>Type</th><th>Amount</th></tr></thead><tbody>${rows || '<tr><td colspan="4">No records</td></tr>'}</tbody>}`;
+      }
+
+      function updateDisplay() {
+        const search = document.getElementById(filterInputId)?.value.toLowerCase() || "";
+        const dateVal = document.getElementById(dateFilterId)?.value || "";
+        let filtered = currentData.filter(item => item.description.toLowerCase().includes(search) || item.type.toLowerCase().includes(search));
+        if(dateVal) filtered = filtered.filter(item => item.date === dateVal);
+        const tableContainer = document.getElementById(containerId);
+        if(tableContainer) tableContainer.innerHTML = renderTable(filtered);
+      }
+
+      const html = `
+        <div class="filter-bar">
+          <input type="text" id="${filterInputId}" placeholder="${placeholderText}" style="flex:2;">
+          <input type="date" id="${dateFilterId}" placeholder="Filter by date">
+          <button class="export-btn" id="exportBtn_${containerId}">📎 Export CSV</button>
+        </div>
+        <div id="${containerId}">${renderTable(initialData)}</div>
+        <p style="font-size:0.7rem; margin-top:12px;">💡 Reconcile accounts effortlessly — search, filter, and export data.</p>
+      `;
+
+      return { html, afterRender: () => {
+        const searchInput = document.getElementById(filterInputId);
+        const dateInput = document.getElementById(dateFilterId);
+        if(searchInput) searchInput.addEventListener('input', updateDisplay);
+        if(dateInput) dateInput.addEventListener('change', updateDisplay);
+        const exportBtn = document.getElementById(`exportBtn_${containerId}`);
+        if(exportBtn) {
+          exportBtn.addEventListener('click', () => {
+            let filtered = [...currentData];
+            const search = document.getElementById(filterInputId)?.value.toLowerCase() || "";
+            const dateVal = document.getElementById(dateFilterId)?.value || "";
+            if(search) filtered = filtered.filter(item => item.description.toLowerCase().includes(search) || item.type.toLowerCase().includes(search));
+            if(dateVal) filtered = filtered.filter(item => item.date === dateVal);
+            let csv = "Date,Description,Type,Amount\n" + filtered.map(t => `${t.date},${t.description},${t.type},${t.amount}`).join("\n");
+            const blob = new Blob([csv], {type: "text/csv"});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob); a.download = `${titlePrefix.replace(/\s/g,'_')}.csv`; a.click(); URL.revokeObjectURL(a.href);
+          });
+        }
+      }};
+    }
+
+    function showExpenseDetail() {
+      const transactions = [
+        { date: "2025-04-01", description: "Grocery Store", type: "Payment", amount: "-$45.20" },
+        { date: "2025-04-02", description: "Salary Deposit", type: "Deposit", amount: "+$3200.00" },
+        { date: "2025-04-03", description: "Online Shopping", type: "Payment", amount: "-$89.99" },
+        { date: "2025-04-05", description: "Freelance Payment", type: "Deposit", amount: "+$500.00" },
+        { date: "2025-04-07", description: "Restaurant", type: "Payment", amount: "-$34.50" },
+        { date: "2025-04-10", description: "Utility Bill", type: "Payment", amount: "-$120.30" },
+        { date: "2025-04-12", description: "Transfer from Savings", type: "Transfer", amount: "+$200.00" }
+      ];
+      const { html, afterRender } = renderFilterableTable(transactions, "Expenses", "Search payments, deposits...");
+      showSubDetail("📋 Expenses Detail", html);
+      setTimeout(() => afterRender(), 10);
+    }
+
+    function showIncomeStreamsDetail() {
+      const incomeData = [
+        { date: "2025-04-01", description: "Salary - Company ABC", type: "Receive", amount: "+$3,200.00" },
+        { date: "2025-04-03", description: "Freelance Project", type: "Receive", amount: "+$850.00" },
+        { date: "2025-04-05", description: "Dividend Payout", type: "Receive", amount: "+$120.50" },
+        { date: "2025-04-07", description: "ATM Withdrawal", type: "Withdraw", amount: "-$200.00" },
+        { date: "2025-04-10", description: "Rental Income", type: "Receive", amount: "+$1,500.00" },
+        { date: "2025-04-12", description: "Bank Transfer (withdraw)", type: "Withdraw", amount: "-$500.00" },
+        { date: "2025-04-15", description: "Cashback Reward", type: "Other", amount: "+$25.00" }
+      ];
+      const { html, afterRender } = renderFilterableTable(incomeData, "Income_Streams", "Search receive, withdraw, other...");
+      showSubDetail("💰 Income Details", html);
+      setTimeout(() => afterRender(), 10);
+    }
+
+    function showCashInsightsDetail() {
+      const insightData = [
+        { date: "2025-04-01", description: "Coffee Shop", type: "Spending", amount: "-$4.50" },
+        { date: "2025-04-02", description: "Uber Ride", type: "Spending", amount: "-$15.30" },
+        { date: "2025-04-03", description: "Netflix Subscription", type: "Spending", amount: "-$15.99" },
+        { date: "2025-04-04", description: "Grocery", type: "Spending", amount: "-$68.20" },
+        { date: "2025-04-05", description: "Salary Credit", type: "Income", amount: "+$3,200.00" }
+      ];
+      const totalSpending = insightData.filter(i => i.type === "Spending").reduce((sum, i) => sum + Math.abs(parseFloat(i.amount.replace(/[^0-9.-]/g, ''))), 0);
+      const totalIncome = insightData.filter(i => i.type === "Income").reduce((sum, i) => sum + parseFloat(i.amount.replace(/[^0-9.-]/g, '')), 0);
+      const patternSummary = `🔹 Last 7 days: Spending $${totalSpending.toFixed(2)} | Income $${totalIncome.toFixed(2)} | Net +$${(totalIncome - totalSpending).toFixed(2)}`;
+      const logData = insightData.map(item => ({ date: item.date, description: item.description, type: item.type, amount: item.amount }));
+      const { html: tableHtml, afterRender } = renderFilterableTable(logData, "Insights_Log", "Search transactions...");
+      const fullHtml = `
+        <div class="insight-card"><strong>📊 Real‑time Dashboard</strong><br>${patternSummary}<br>⚡ Spending patterns: High on weekends.</div>
+        <div class="insight-card"><strong>🔔 Instant Notifications</strong><br>• Large transaction detected<br>• Daily budget remaining: 68%</div>
+        <hr><h3>📜 Transaction Log</h3>${tableHtml}
+      `;
+      showSubDetail("⚡ Real-time Cash Insights", fullHtml);
+      setTimeout(() => afterRender(), 10);
+    }
+
+    function showTransactionHistoryDetail() {
+      const allTransactions = [
+        { date: "2025-03-28", description: "Electric Bill", type: "Payment", amount: "-$95.00" },
+        { date: "2025-03-30", description: "Salary", type: "Receive", amount: "+$3,200.00" },
+        { date: "2025-04-01", description: "Groceries", type: "Payment", amount: "-$58.40" },
+        { date: "2025-04-02", description: "Refund", type: "Receive", amount: "+$34.99" }
+      ];
+      const { html, afterRender } = renderFilterableTable(allTransactions, "Transaction_History", "Search payments, receives...");
+      showSubDetail("📜 Transaction History", html);
+      setTimeout(() => afterRender(), 10);
+    }
+
+    // Other category functions (sims, mobiles, bank)
+    function showSimsIssue() { showSubDetail("📞 SIMS Issue", "<p>Report SIM card issues: lost/stolen, network problems.</p><div class='category-desc'>Contact support: 123-456-7890</div>"); }
+    function showSimsStock() { showSubDetail("📦 SIMS Stock", "<p>Prepaid SIMs: 342 units<br>Postpaid: 128<br>eSIMs: 56</p>"); }
+    function showMobileName() { showSubDetail("📱 Mobile Name", "<p>iPhone 15 Pro, Samsung S24, Google Pixel 8</p>"); }
+    function showMobileCompany() { showSubDetail("🏢 Company", "<p>Apple, Samsung, Google, OnePlus</p>"); }
+    function showMobileIMEI() { showSubDetail("🔢 IMEI", "<p>IMEI: 15-digit unique ID.<br>Sample: 354123456789012</p>"); }
+    function showBankDetail(bankName) {
+      const details = { "alfalahbank":"Bank Alfalah", "meezan bank":"Meezan Bank", "hbl bank":"HBL", "habib bank":"Habib Bank", "national bank":"NBP", "new bank":"New Bank" };
+      showSubDetail(`🏦 ${bankName}`, `<div class='category-desc'>${details[bankName.toLowerCase()] || "Banking services"}</div><p>✔️ Open account, transfers</p>`);
+    }
+
+    // Load sub-buttons for Cash (6 buttons including Enter Income)
+    function loadSubButtonsForCategory(category) {
+      const container = document.getElementById('subButtonsContainer');
+      container.innerHTML = '';
+      if(category === 'cash') {
+        const subs = [
+          { label: "💰 Track your expenses", action: showExpenseDetail },
+          { label: "📈 Income streams", action: showIncomeStreamsDetail },
+          { label: "🎯 Budgeting goals", action: showBudgetingGoals },
+          { label: "⚡ Real-time cash insights", action: showCashInsightsDetail },
+          { label: "📜 Transaction history", action: showTransactionHistoryDetail },
+          { label: "💵 Enter Income", action: showEnterIncome }
+        ];
+        subs.forEach(s => {
+          const btn = document.createElement('button');
+          btn.className = 'sub-cat-btn';
+          btn.innerText = s.label;
+          btn.addEventListener('click', (e) => { e.stopPropagation(); s.action(); });
+          container.appendChild(btn);
+        });
+        document.getElementById('categoryDynamicHeading').innerText = "💰 Cash Management";
+        document.getElementById('categoryDetailedDesc').innerHTML = "<strong>Complete control</strong><br>Track your expenses, income streams, budgeting goals, real-time insights, transaction history, and enter new income.";
+        container.style.display = 'flex';
+      }
+      else if(category === 'sims') {
+        const subs = [
+          { label: "📞 SIMS Issue", action: showSimsIssue },
+          { label: "📦 SIMS Stock", action: showSimsStock }
+        ];
+        subs.forEach(s => {
+          const btn = document.createElement('button'); btn.className = 'sub-cat-btn'; btn.innerText = s.label;
+          btn.addEventListener('click', () => s.action());
+          container.appendChild(btn);
+        });
+        document.getElementById('categoryDynamicHeading').innerText = "📱 SIM Management";
+        document.getElementById('categoryDetailedDesc').innerHTML = "<strong>SIM cards control</strong><br>Manage issues, inventory, and activations.";
+        container.style.display = 'flex';
+      }
+      else if(category === 'mobiles') {
+        const subs = [
+          { label: "📱 Mobile Name", action: showMobileName },
+          { label: "🏢 Company", action: showMobileCompany },
+          { label: "🔢 IMEI", action: showMobileIMEI }
+        ];
+        subs.forEach(s => {
+          const btn = document.createElement('button'); btn.className = 'sub-cat-btn'; btn.innerText = s.label;
+          btn.addEventListener('click', () => s.action());
+          container.appendChild(btn);
+        });
+        document.getElementById('categoryDynamicHeading').innerText = "📲 Mobile Devices";
+        document.getElementById('categoryDetailedDesc').innerHTML = "<strong>Smartphone catalog</strong><br>View mobile names, companies, and IMEI details.";
+        container.style.display = 'flex';
+      }
+      else if(category === 'bank') {
+        const banks = ["alfalahbank", "meezan bank", "hbl bank", "habib bank", "national bank", "new bank"];
+        banks.forEach(bank => {
+          const btn = document.createElement('button'); btn.className = 'sub-cat-btn'; btn.innerText = bank.toUpperCase();
+          btn.addEventListener('click', () => showBankDetail(bank));
+          container.appendChild(btn);
+        });
+        document.getElementById('categoryDynamicHeading').innerText = "🏦 Banking Hub";
+        document.getElementById('categoryDetailedDesc').innerHTML = "<strong>Select a bank</strong><br>View account details, services, and support.";
+        container.style.display = 'flex';
+      }
+      else {
+        container.style.display = 'none';
+        document.getElementById('categoryDynamicHeading').innerText = category.toUpperCase();
+        document.getElementById('categoryDetailedDesc').innerHTML = `<strong>${category} section</strong><br>Explore features.`;
+      }
+    }
+
+    function showCategoryPage(category) {
+      const session = getSession();
+      if(!session) { showPage('login'); return; }
+      currentCategory = category;
+      loadSubButtonsForCategory(category);
+      showPage('category');
+    }
+
+    // Back handlers
+    function backToDashboard() { showPage('dashboard'); }
+    function backToCategory() { if(currentCategory) showCategoryPage(currentCategory); else showPage('dashboard'); }
+
+    // Auth handlers
+    function handleLogin() {
+      const email = document.getElementById('loginEmail').value.trim();
+      const pwd = document.getElementById('loginPassword').value;
+      const errDiv = document.getElementById('loginErrorMsg');
+      if(!email || !pwd) { errDiv.innerText="❌ Required fields"; errDiv.style.display='block'; return; }
+      if(!isValidEmail(email)) { errDiv.innerText="❌ Invalid email"; errDiv.style.display='block'; return; }
+      const user = getUsers().find(u => u.email === email && u.password === pwd);
+      if(!user) { errDiv.innerText="❌ Invalid credentials"; errDiv.style.display='block'; return; }
+      setSession({ fullName: user.fullName, email: user.email });
+      refreshDashboard(); showPage('dashboard');
+      errDiv.style.display='none';
+    }
+    function handleSignup() {
+      const name = document.getElementById('signupName').value.trim();
+      const email = document.getElementById('signupEmail').value.trim();
+      const pwd = document.getElementById('signupPassword').value;
+      const conf = document.getElementById('signupConfirm').value;
+      const errDiv = document.getElementById('signupErrorMsg');
+      const succDiv = document.getElementById('signupSuccessMsg');
+      if(!name || !email || !pwd || !conf) { errDiv.innerText="All fields required"; errDiv.style.display='block'; return; }
+      if(!isValidEmail(email)) { errDiv.innerText="Invalid email"; errDiv.style.display='block'; return; }
+      if(pwd.length < 6) { errDiv.innerText="Password min 6 chars"; errDiv.style.display='block'; return; }
+      if(pwd !== conf) { errDiv.innerText="Passwords don't match"; errDiv.style.display='block'; return; }
+      if(getUsers().some(u => u.email === email)) { errDiv.innerText="Email already exists"; errDiv.style.display='block'; return; }
+      saveUsers([...getUsers(), { fullName: name, email, password: pwd }]);
+      succDiv.innerText="✅ Account created! Redirecting..."; succDiv.style.display='block';
+      setTimeout(() => { showPage('login'); succDiv.style.display='none'; }, 1200);
+    }
+    function handleLogout() { setSession(null); showPage('login'); }
+
+    function bindMainCategories() {
+      document.querySelectorAll('.cat-action').forEach(btn => {
+        btn.removeEventListener('click', categoryClickHandler);
+        btn.addEventListener('click', categoryClickHandler);
+      });
+    }
+    function categoryClickHandler(e) {
+      const cat = e.currentTarget.getAttribute('data-category');
+      if(cat) showCategoryPage(cat);
+    }
+
+    function checkAuth() {
+      const sess = getSession();
+      if(sess) { refreshDashboard(); showPage('dashboard'); }
+      else showPage('login');
+    }
+
+    function initEventListeners() {
+      document.getElementById('loginBtn').addEventListener('click', handleLogin);
+      document.getElementById('signupBtn').addEventListener('click', handleSignup);
+      document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+      document.getElementById('toSignupLink').addEventListener('click', (e) => { e.preventDefault(); showPage('signup'); });
+      document.getElementById('toLoginLink').addEventListener('click', (e) => { e.preventDefault(); showPage('login'); });
+      document.getElementById('backToDashboardBtn').addEventListener('click', backToDashboard);
+      document.getElementById('backToCategoryBtn').addEventListener('click', backToCategory);
+      bindMainCategories();
+    }
+
+    seedDemo();
+    initEventListeners();
+    checkAuth();
+  })();
+</script>
+</body>
+</html>
