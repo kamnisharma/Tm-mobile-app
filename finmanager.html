@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>FinManager - Mobile Finance App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f0f2f5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 16px;
+        }
+
+        #app {
+            width: 100%;
+            max-width: 420px;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            min-height: 85vh;
+            position: relative;
+        }
+
+        .page {
+            padding: 24px 20px 32px;
+            animation: fadeIn 0.25s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: white;
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.03);
+            border: 1px solid #eef2f6;
+        }
+
+        .total-card {
+            background: linear-gradient(135deg, #1a3c5e 0%, #2c5a7a 100%);
+            color: white;
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .total-amount {
+            font-size: 32px;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+
+        .total-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .btn-primary {
+            background: #1a3c5e;
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 40px;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.97);
+        }
+
+        .btn-secondary {
+            background: #eef2ff;
+            color: #1a3c5e;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 40px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 28px;
+            font-size: 15px;
+            margin-bottom: 14px;
+            background: #fefefe;
+        }
+
+        .input:focus {
+            outline: none;
+            border-color: #1a3c5e;
+        }
+
+        .error {
+            color: #e53e3e;
+            font-size: 12px;
+            margin-top: -8px;
+            margin-bottom: 12px;
+        }
+
+        .success {
+            color: #2c7a4b;
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 16px 0;
+        }
+
+        .cat-btn {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 12px 8px;
+            border-radius: 24px;
+            font-weight: 600;
+            text-align: center;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.1s;
+        }
+
+        .cat-btn:active {
+            background: #e2e8f0;
+            transform: scale(0.96);
+        }
+
+        .sub-btn {
+            background: white;
+            border: 1px solid #e2e8f0;
+            padding: 14px 16px;
+            border-radius: 60px;
+            width: 100%;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .sub-btn:active {
+            background: #f1f5f9;
+        }
+
+        .back-link {
+            background: none;
+            border: none;
+            color: #1a3c5e;
+            font-weight: 500;
+            margin-bottom: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .logout-btn {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .transaction-item {
+            border-bottom: 1px solid #edf2f7;
+            padding: 12px 0;
+        }
+
+        hr {
+            margin: 16px 0;
+        }
+
+        h2 {
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+
+        h3 {
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .filter-row input {
+            flex: 1;
+            margin-bottom: 0;
+            min-width: 100px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .stat-card {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1a3c5e;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+<div id="app"></div>
+
+<!-- Load React and ReactDOM -->
+<script src="https://unpkg.com/react@18.2.0/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"></script>
+
+<script>
+    // ==================== SIMPLE STATE MANAGEMENT ====================
+    let currentUser = null;
+    let currentPage = 'login';
+    
+    // Store income entries globally
+    let globalIncomeEntries = [];
+    let globalExpenseEntries = [];
+    
+    // Mock data for transactions
+    const expenseData = [
+        { date: "2025-04-01", description: "Grocery shopping", amount: 85, type: "expense" },
+        { date: "2025-04-03", description: "Netflix subscription", amount: 15, type: "expense" },
+        { date: "2025-04-05", description: "Electric bill", amount: 120, type: "expense" },
+        { date: "2025-04-07", description: "Restaurant", amount: 45, type: "expense" },
+    ];
+    
+    const incomeData = [
+        { date: "2025-04-02", description: "Salary deposit", amount: 2500, type: "income" },
+        { date: "2025-04-04", description: "Freelance", amount: 350, type: "income" },
+    ];
+    
+    // Load saved entries from localStorage
+    function loadEntries() {
+        const savedIncome = localStorage.getItem('finmanager_income_entries');
+        const savedExpense = localStorage.getItem('finmanager_expense_entries');
+        if (savedIncome) globalIncomeEntries = JSON.parse(savedIncome);
+        else globalIncomeEntries = [...incomeData];
+        
+        if (savedExpense) globalExpenseEntries = JSON.parse(savedExpense);
+        else globalExpenseEntries = [...expenseData];
+    }
+    
+    function saveEntries() {
+        localStorage.setItem('finmanager_income_entries', JSON.stringify(globalIncomeEntries));
+        localStorage.setItem('finmanager_expense_entries', JSON.stringify(globalExpenseEntries));
+    }
+    
+    // Add income entry
+    function addIncomeEntry(date, description, amount) {
+        const newEntry = { date, description, amount: parseFloat(amount), type: "income" };
+        globalIncomeEntries.push(newEntry);
+        saveEntries();
+        return true;
+    }
+    
+    // Add expense entry
+    function addExpenseEntry(date, description, amount) {
+        const newEntry = { date, description, amount: parseFloat(amount), type: "expense" };
+        globalExpenseEntries.push(newEntry);
+        saveEntries();
+        return true;
+    }
+    
+    // Calculate total income
+    function getTotalIncome() {
+        return globalIncomeEntries.reduce((sum, entry) => sum + entry.amount, 0);
+    }
+    
+    // Calculate total expenses
+    function getTotalExpenses() {
+        return globalExpenseEntries.reduce((sum, entry) => sum + entry.amount, 0);
+    }
+    
+    // Calculate balance
+    function getBalance() {
+        return getTotalIncome() - getTotalExpenses();
+    }
+    
+    // Load saved data
+    function loadUsers() {
+        const saved = localStorage.getItem('finmanager_users');
+        if (saved) return JSON.parse(saved);
+        return [{ fullName: "Test User", email: "test@example.com", password: "123456" }];
+    }
+    
+    function saveUsers(users) {
+        localStorage.setItem('finmanager_users', JSON.stringify(users));
+    }
+    
+    function loadSession() {
+        const saved = localStorage.getItem('finmanager_session');
+        if (saved) {
+            currentUser = JSON.parse(saved);
+        }
+    }
+    
+    function saveSession() {
+        if (currentUser) {
+            localStorage.setItem('finmanager_session', JSON.stringify(currentUser));
+        } else {
+            localStorage.removeItem('finmanager_session');
+        }
+    }
+    
+    // Auth functions
+    function login(email, password) {
+        const users = loadUsers();
+        const found = users.find(u => u.email === email && u.password === password);
+        if (found) {
+            currentUser = { fullName: found.fullName, email: found.email };
+            saveSession();
+            loadEntries();
+            return true;
+        }
+        return false;
+    }
+    
+    function signup(fullName, email, password) {
+        const users = loadUsers();
+        if (users.find(u => u.email === email)) return false;
+        users.push({ fullName, email, password });
+        saveUsers(users);
+        return true;
+    }
+    
+    function logout() {
+        currentUser = null;
+        saveSession();
+        navigateTo('login');
+    }
+    
+    // Navigation
+    function navigateTo(page, params = null) {
+        currentPage = page;
+        window.pageParams = params;
+        render();
+    }
+    
+    // ==================== REACT COMPONENTS ====================
+    const { useState, useEffect } = React;
+    
+    // Transaction Log Component
+    function TransactionLogComponent({ title, transactions, type }) {
+        const [search, setSearch] = useState('');
+        const [startDate, setStartDate] = useState('');
+        const [endDate, setEndDate] = useState('');
+        const [localTransactions, setLocalTransactions] = useState(transactions);
+        
+        // Refresh when transactions prop changes
+        useEffect(() => {
+            setLocalTransactions(transactions);
+        }, [transactions]);
+        
+        const filtered = localTransactions.filter(tx => {
+            const matchSearch = tx.description.toLowerCase().includes(search.toLowerCase());
+            const txDate = tx.date;
+            if (startDate && txDate < startDate) return false;
+            if (endDate && txDate > endDate) return false;
+            return matchSearch;
+        });
+        
+        const totalAmount = filtered.reduce((sum, tx) => sum + tx.amount, 0);
+        
+        const exportCSV = () => {
+            let csv = "Date,Description,Amount,Type\n";
+            filtered.forEach(tx => {
+                csv += `${tx.date},${tx.description},${tx.amount},${tx.type}\n`;
+            });
+            const blob = new Blob([csv], { type: "text/csv" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${title.replace(/\s/g, '_')}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        };
+        
+        return React.createElement('div', { className: "card" },
+            React.createElement('h3', {}, title),
+            React.createElement('div', { className: "filter-row" },
+                React.createElement('input', { type: "text", placeholder: "Search...", className: "input", value: search, onChange: (e) => setSearch(e.target.value) }),
+                React.createElement('input', { type: "date", className: "input", value: startDate, onChange: (e) => setStartDate(e.target.value) }),
+                React.createElement('input', { type: "date", className: "input", value: endDate, onChange: (e) => setEndDate(e.target.value) }),
+                React.createElement('button', { className: "btn-secondary", onClick: exportCSV }, "📎 Export")
+            ),
+            React.createElement('div', { className: "stat-card", style: { marginBottom: '12px', background: '#eef2ff' } },
+                React.createElement('div', { className: "stat-value" }, `$${totalAmount.toFixed(2)}`),
+                React.createElement('div', { className: "stat-label" }, `Total ${title}`)
+            ),
+            React.createElement('div', { style: { maxHeight: '350px', overflowY: 'auto' } },
+                filtered.length === 0 && React.createElement('div', { style: { padding: '20px', textAlign: 'center', color: '#94a3b8' } }, "No records"),
+                filtered.map((tx, idx) => React.createElement('div', { key: idx, className: "transaction-item" },
+                    React.createElement('div', { className: "flex-between" },
+                        React.createElement('strong', {}, tx.date),
+                        React.createElement('span', { style: { fontWeight: 600, color: tx.type === 'income' ? '#2c7a4b' : '#b91c1c' } }, `$${tx.amount.toFixed(2)}`)
+                    ),
+                    React.createElement('div', { style: { fontSize: 14 } }, tx.description)
+                ))
+            )
+        );
+    }
+    
+    // Login Page
+    function LoginPage() {
+        const [email, setEmail] = useState('');
+        const [password, setPassword] = useState('');
+        const [error, setError] = useState('');
+        
+        const handleSubmit = (e) => {
+            e.preventDefault();
+            if (!email || !password) return setError('All fields required');
+            if (!/^\S+@\S+\.\S+$/.test(email)) return setError('Invalid email format');
+            if (login(email, password)) {
+                navigateTo('dashboard');
+            } else {
+                setError('Invalid email or password');
+            }
+        };
+        
+        return React.createElement('div', { className: "page" },
+            React.createElement('div', { className: "card", style: { marginTop: '30px' } },
+                React.createElement('h2', {}, "Welcome Back"),
+                React.createElement('form', { onSubmit: handleSubmit },
+                    React.createElement('input', { type: "email", placeholder: "Email address", className: "input", value: email, onChange: (e) => setEmail(e.target.value) }),
+                    React.createElement('input', { type: "password", placeholder: "Password", className: "input", value: password, onChange: (e) => setPassword(e.target.value) }),
+                    error && React.createElement('div', { className: "error" }, error),
+                    React.createElement('button', { type: "submit", className: "btn-primary" }, "Login →"),
+                    React.createElement('div', { style: { textAlign: 'center', marginTop: '20px' } },
+                        React.createElement('button', { style: { background: 'none', border: 'none', color: '#1a3c5e', cursor: 'pointer' }, onClick: () => navigateTo('signup') }, "Create account → Sign up")
+                    )
+                )
+            )
+        );
+    }
+    
+    // Signup Page
+    function SignupPage() {
+        const [fullName, setFullName] = useState('');
+        const [email, setEmail] = useState('');
+        const [password, setPassword] = useState('');
+        const [confirm, setConfirm] = useState('');
+        const [error, setError] = useState('');
+        const [success, setSuccess] = useState('');
+        
+        const handleSubmit = (e) => {
+            e.preventDefault();
+            if (!fullName || !email || !password) return setError('All fields required');
+            if (password.length < 6) return setError('Password must be at least 6 characters');
+            if (password !== confirm) return setError('Passwords do not match');
+            if (!/^\S+@\S+\.\S+$/.test(email)) return setError('Invalid email');
+            if (signup(fullName, email, password)) {
+                setSuccess('Account created! Redirecting...');
+                setTimeout(() => navigateTo('login'), 1500);
+            } else {
+                setError('Email already exists');
+            }
+        };
+        
+        return React.createElement('div', { className: "page" },
+            React.createElement('div', { className: "card" },
+                React.createElement('h2', {}, "Join FinManager"),
+                React.createElement('form', { onSubmit: handleSubmit },
+                    React.createElement('input', { placeholder: "Full Name", className: "input", value: fullName, onChange: (e) => setFullName(e.target.value) }),
+                    React.createElement('input', { placeholder: "Email", className: "input", value: email, onChange: (e) => setEmail(e.target.value) }),
+                    React.createElement('input', { type: "password", placeholder: "Password (min 6)", className: "input", value: password, onChange: (e) => setPassword(e.target.value) }),
+                    React.createElement('input', { type: "password", placeholder: "Confirm Password", className: "input", value: confirm, onChange: (e) => setConfirm(e.target.value) }),
+                    error && React.createElement('div', { className: "error" }, error),
+                    success && React.createElement('div', { className: "success" }, success),
+                    React.createElement('button', { type: "submit", className: "btn-primary" }, "Sign Up"),
+                    React.createElement('div', { style: { marginTop: '16px', textAlign: 'center' } },
+                        React.createElement('button', { style: { background: 'none', border: 'none', color: '#1a3c5e', cursor: 'pointer' }, onClick: () => navigateTo('login') }, "← Back to Login")
+                    )
+                )
+            )
+        );
+    }
+    
+    // Dashboard with totals
+    function DashboardPage() {
+        const [totalIncome, setTotalIncome] = useState(0);
+        const [totalExpenses, setTotalExpenses] = useState(0);
+        const [balance, setBalance] = useState(0);
+        
+        useEffect(() => {
+            setTotalIncome(getTotalIncome());
+            setTotalExpenses(getTotalExpenses());
+            setBalance(getBalance());
+        }, []);
+        
+        const categories = [
+            { name: 'Cash', emoji: '💰', page: 'cash' },
+            { name: 'Sims', emoji: '📱', page: 'sims' },
+            { name: 'Mobiles', emoji: '📲', page: 'mobiles' },
+            { name: 'Bank', emoji: '🏦', page: 'bank' },
+            { name: 'Property', emoji: '🏠', page: 'property' },
+            { name: 'Notes', emoji: '📝', page: 'notes' }
+        ];
+        
+        return React.createElement('div', { className: "page" },
+            React.createElement('div', { className: "flex-between", style: { marginBottom: '20px' } },
+                React.createElement('h2', {}, "FinManager"),
+                React.createElement('button', { className: "logout-btn", onClick: logout }, "Logout")
+            ),
+            React.createElement('div', { className: "total-card" },
+                React.createElement('div', { className: "total-label" }, "Total Balance"),
+                React.createElement('div', { className: "total-amount" }, `$${balance.toFixed(2)}`),
+                React.createElement('div', { className: "stats-grid" },
+                    React.createElement('div', { className: "stat-card", style: { background: 'rgba(255,255,255,0.2)' } },
+                        React.createElement('div', { className: "stat-value", style: { color: 'white' } }, `$${totalIncome.toFixed(2)}`),
+                        React.createElement('div', { className: "stat-label", style: { color: 'rgba(255,255,255,0.8)' } }, "Total Income")
+                    ),
+                    React.createElement('div', { className: "stat-card", style: { background: 'rgba(255,255,255,0.2)' } },
+                        React.createElement('div', { className: "stat-value", style: { color: 'white' } }, `$${totalExpenses.toFixed(2)}`),
+                        React.createElement('div', { className: "stat-label", style: { color: 'rgba(255,255,255,0.8)' } }, "Total Expenses")
+                    )
+                )
+            ),
+            React.createElement('div', { className: "card" },
+                React.createElement('p', { style: { fontSize: '18px', fontWeight: 500 } }, `👋 Welcome, ${currentUser?.fullName || 'User'}!`),
+                React.createElement('p', { style: { color: '#475569', marginTop: '6px' } }, "Smart money, smart life.")
+            ),
+            React.createElement('div', { className: "grid-3" },
+                categories.map(cat => 
+                    React.createElement('button', { key: cat.name, className: "cat-btn", onClick: () => navigateTo(cat.page) }, `${cat.emoji} ${cat.name}`)
+                )
+            )
+        );
+    }
+    
+    // Cash Page with totals
+    function CashPage() {
+        const [totalIncome, setTotalIncome] = useState(0);
+        const [totalExpenses, setTotalExpenses] = useState(0);
+        const [balance, setBalance] = useState(0);
+        
+        useEffect(() => {
+            setTotalIncome(getTotalIncome());
+            setTotalExpenses(getTotalExpenses());
+            setBalance(getBalance());
+        }, []);
+        
+        const actions = [
+            { name: 'Track your expenses', page: 'cash_expenses', emoji: '📉' },
+            { name: 'Income streams', page: 'cash_income', emoji: '📈' },
+            { name: 'Real-time cash insights', page: 'cash_insights', emoji: '⚡' },
+            { name: 'Transaction history', page: 'cash_history', emoji: '📜' },
+            { name: 'Budgeting goals', page: 'cash_budget', emoji: '🎯' },
+            { name: 'Enter Income', page: 'cash_income_form', emoji: '➕' },
+        ];
+        
+        return React.createElement('div', { className: "page" },
+            React.createElement('button', { className: "back-link", onClick: () => navigateTo('dashboard') }, "← Dashboard"),
+            React.createElement('h2', {}, "💰 Cash Hub"),
+            React.createElement('div', { className: "total-card", style: { background: 'linear-gradient(135deg, #2c7a4b 0%, #3a9b5e 100%)' } },
+                React.createElement('div', { className: "total-label" }, "Current Balance"),
+                React.createElement('div', { className: "total-amount" }, `$${balance.toFixed(2)}`),
+                React.createElement('div', { className: "stats-grid" },
+                    React.createElement('div', { className: "stat-card", style: { background: 'rgba(255,255,255,0.2)' } },
+                        React.createElement('div', { className: "stat-value", style: { color: 'white' } }, `$${totalIncome.toFixed(2)}`),
+                        React.createElement('div', { className: "stat-label", style: { color: 'rgba(255,255,255,0.8)' } }, "Total Income")
+                    ),
+                    React.createElement('div', { className: "stat-card", style: { background: 'rgba(255,255,255,0.2)' } },
+                        React.createElement('div', { className: "stat-value", style: { color: 'white' } }, `$${totalExpenses.toFixed(2)}`),
+                        React.createElement('div', { className: "stat-label", style: { color: 'rgba(255,255,255,0.8)' } }, "Total Expenses")
+                    )
+                )
+            ),
+            React.createElement('div', {},
+                actions.map(act => 
+                    React.createElement('button', { key: act.name, className: "sub-btn", onClick: () => navigateTo(act.page) },
+                        React.createElement('span', {}, act.emoji),
+                        act.name
+                    )
+                )
+            )
+        );
+    }
+    
+    // Cash subpages
+    function ExpensesPage() { 
+        return React.createElement('div', { className: "page" }, 
+            React.createElement('button', { className: "back-link", onClick: () => navigateTo('cash') }, "← Back"), 
+            React.createElement(TransactionLogComponent, { title: "Expenses", transactions: globalExpenseEntries, type: "expense" })
+        ); 
+    }
+    
+    function IncomePage() { 
+        return React.createElement('div', { className: "page" }, 
+            React.createElement('button', { className: "back-link", onClick: () => navigateTo('cash') }, "← Back"), 
+            React.createElement(TransactionLogComponent, { title: "Income Streams", transactions: globalIncomeEntries, type: "income" })
+        ); 
+    }
+    
+    function HistoryPage() { 
+        const allTransactions = [...globalIncomeEntries, ...globalExpenseEntries].sort((a,b) => b.date.localeCompare(a.date));
+        return React.createElement('div', { className: "page" }, 
+            React.createElement('button', { className: "back-link", onClick: () => navigateTo('cash') }, "← Back"), 
+            React.createElement(TransactionLogComponent, { title: "Transaction History", transactions: allTransactions })
+        ); 
+    }
+    
+    function InsightsPage() { 
+        const totalIncome = getTotalIncome();
+        const totalExpenses = getTotalExpenses();
+        const balance = getBalance();
+        
+        return React.createElement('div', { className: "page" },
+            React.createElement('button', { className: "back-link", onClick: () => navigateTo('cash') }, "← Back"),
+            React.createElement('div', { className: "card" },
+                React.createElement('h3', {}, "Real‑time Cash Insights"),
+                React.createElement('p', {}, "📊 Live dashboard with spending patterns"),
+                React.createElement('div', { style: { background: '#f1f5f9', borderRadius: '16px', padding: '12px', margin: '12px 0' } },
+                    React.createElement('p', {}, `💰 Total Income: $${totalIncome.toFixed(2)}`),
+                    React.createElement('p', {}, `💸 Total Expenses: $${totalExpenses.toFixed(2)}`),
+                    React.createElement('p', {}, `⚖️ Net Balance: $${balance.toFixed(2)}`),
+                    React.createElement('p', {}, "🔔 Weekly spend +12% vs last week"),
+                    React.createElement('p', {}, "🍕 Top category: Dining ($210)")
+                )
+            )
+        );
+    }
+    
+    function BudgetPage() {
+        const [entries, setEntries] = useState([]);
+        const [date, setDate] = useState('');
+        const [desc, setDesc] = useState('');
+        const [amount, setAmount] = useState('');
+        const [totalBudget, setTotalBudget] = useState(0);
+        
+        useEffect(() => {
+            const sum = entries.reduce((total, e) => total + parseFloat(e.amount || 0), 0);
+            setTotalBudget(sum);
+        }, [entries]);
+        
+        const addEntry = () => {
+            if (date && desc && amount) {
+                addExpenseEntry(date, desc, amount);
+                setEntries([...entries, { date, desc, amount: parseFloat(amount) }]);
+                setDate(''); setDesc(''); setAmount('');
+            }
+        };
+        
+        return React.createElement('div', { className: "page" },
+            React.createElement('button', { className: "back-link", onClick: () => navigateTo('cash') }, "← Back"),
+            React.createElement('div', { className: "card" },
+                React.createElement('h3', {}, "Budgeting Goals - Add Expense"),
+                React.createElement('div', { className: "stat-card", style: { marginBottom: '16px', background: '#eef2ff' } },
+                    React.createElement('div', { className: "stat-value" }, `$${totalBudget.toFixed(2)}`),
+                    React.createElement('div', { className: "stat-label" }, "Total Budgeted Expenses")
+                ),
+                React.createElement('input', { type: "date", className: "input", value: date, onChange: (e) => setDate(e.target.value) }),
+                React.createElement('input', { placeholder: "Description", className: "input", value: desc, onChange: (e) => setDesc(e.target.value) }),
+                React.createElement('input', { placeholder: "Amount", type: "number", className: "input", value: amount, onChange: (e) => setAmount(e.target.value) }),
+                React.createElement('button', { className: "btn-primary", onClick: addEntry }, "Add Expense"),
+                React.createElement('hr', {}),
+                React.createElement('h4', {}, "Recent Expenses"),
+                entries.map((e, i) => React.createElement('div', { key: i, className: "transaction-item" }, `${e.date} - ${e.desc} : $${e.amount.toFixed(2)}`))
+            )
+        );
+    }
+    
+    function IncomeFormPage() {
+        const [entries, setEntries] = useState([]);
+        const [date, setDate] = useState('');
+        const [desc, setDesc] = useState('');
+        const [amount, setAmount] = useState('');
+        const [totalIncomeAmount, setTotalIncomeAmount] = useState(0);
+        
+        useEffect(() => {
+            // Load existing income entries
+            setEntries(globalIncomeEntries);
+            const sum = globalIncomeEntries.reduce((total, e) => total + e.amount, 0);
+            setTotalIncomeAmount(sum);
+        }, []);
+        
+        const addIncome = () => {
+            if (date && desc && amount) {
+                const amountNum = parseFloat(amount);
+                addIncomeEntry(date, desc, amountNum);
+                setEntries([...entries, { date, description: desc, amount: amountNum, type: "income" }]);
+                setTotalIncomeAmount(totalIncomeAmount + amountNum);
+                setDate(''); setDesc(''); setAmount('');
+                // Force re-render of other components
+                render();
+            }
+        };
+        
+        return React.createElement('div', { className: "page" },
+            React.createElement('button', { className: "back-link", onClick: () => navigateTo('cash') }, "← Back"),
+            React.createElement('div', { className: "card" },
+                React.createElement('h3', {}, "Enter Income"),
+                React.createElement('div', { className: "total-card", style: { background: 'linear-gradient(135deg, #2c7a4b 0%, #3a9b5e 100%)', marginBottom: '20px' } },
+                    React.createElement('div', { className: "total-label" }, "Total Income Received"),
+                    React.createElement('div', { className: "total-amount" }, `$${totalIncomeAmount.toFixed(2)}`)
+                ),
+                React.createElement('input', { type: "date", className: "input", value: date, onChange: (e) => setDate(e.target.value) }),
+                React.createElement('input', { placeholder: "Description (e.g., Salary, Freelance)", className: "input", value: desc, onChange: (e) => setDesc(e.target.value) }),
+                React.createElement('input', { placeholder: "Amount", type: "number", className: "input", value: amount, onChange: (e) => setAmount(e.target.value) }),
+                React.createElement('button', { className: "btn-primary", onClick: addIncome }, "Add Income"),
+                React.createElement('hr', {}),
+                React.createElement('h4', {}, "Income History"),
+                React.createElement('div', { style: { maxHeight: '300px', overflowY: 'auto' } },
+                    entries.slice().reverse().map((e, i) => React.createElement('div', { key: i, className: "transaction-item" }, 
+                        React.createElement('div', { className: "flex-between" },
+                            React.createElement('strong', {}, e.date),
+                            React.createElement('span', { style: { color: '#2c7a4b', fontWeight: 'bold' } }, `+$${e.amount.toFixed(2)}`)
+                        ),
+                        React.createElement('div', { style: { fontSize: 14 } }, e.description)
+                    ))
+                )
+            )
+        );
+    }
+    
+    // Sims Page
+    function SimsPage() {
+        return React.createElement('div', { className: "page" },
+            React.createElement('button', { className: "back-link", onClick: () => navigateTo('dashboard') }, "← Dashboard"),
+            React.createElement('h2', {}, "📱 SIM Management"),
+            React.createElement('div', { className: "grid-2" },
+                React.createElement('button', { className: "cat-btn", onClick: () => navigateTo('sims_issue') }, "📌 Sims Issue"),
+                React.createElement('button', { className: "cat-btn", onClick: () => navigateTo('sims_stock') }, "📦 Sims Stock")
+            )
+        );
+    }
+    
+    function SimsIssuePage() {
+        return React.createElement('div', { className: "page" },
+            React.createElement('button', { className: "back-link", onClick: () => navigateTo('sims') }, "← Back"),
+            React.createElement('div', { className: "card" },
+                React.createElement('h3', {}, "Sims Issue Requests"),
+                React.createElement('ul', { style: { marginLeft: '20px' } },
+                    React.createElement('li', {}, "+92300123456 - Pending"),
+                    React.createElement('li', {}, "+92333111222 - Approved"),
+                    React.createElement('li', {}, "+92345555666 - Replacement")
+                )
+            )
+        );
+    }
+    
+    function SimsStockPage() {
+        return React.createElement('div', { className: "page" },
+            React.createElement('button', { className: "back-link", onClick: () => navigateTo('sims') }, "← Back"),
+            React.createElement('div', { className: "card" },
+                React.createElement('h3', {}, "SIM Stock Inventory"),
+                React.createElement('p', {}, "Jazz: 45 units | Zong: 32 | Telenor: 21 | Ufone: 18")
+            )
+        );
+    }
+    
+    // Mobiles Page
+    function MobilesPage() {
+        return React.createElement('div', { className: "page" },
+            React.createElement('button', { className: "back-link", onClick: () => navigateTo('dashboard') }, "← Dashboard"),
+            React.createElement('h2', {}, "📱 Mobiles"),
+            React.createElement('div', { className: "grid-3" },
+                React.createElement('button', { className: "cat-btn", onClick: () => navigateTo('mobiles_name') }, "📱 Mobile Name"),
+                React.createElement('button', { className: "cat-btn", onClick: () => navigateTo('mobiles_company') }, "🏭 Company"),
+                React.createElement('button', { className: "cat-btn", onClick: () => navigateTo('mobiles_imei') }, "🔢 IMEI")
+            )
+        );
+    }
+    
+    function MobileNamePage() { 
+        return React.createElement('div', { className: "page" }, 
+            React.createElement('button', { className: "back-link", onClick: () => navigateTo('mobiles') }, "← Back"), 
+            React.createElement('div', { className: "card" }, 
+                React.createElement('h3', {}, "Mobile Models"), 
+                React.createElement('p', {}, "iPhone 15 Pro, Samsung S24, Pixel 8, Xiaomi 13T")
+            )
+        ); 
+    }
+    
+    function MobileCompanyPage() { 
+        return React.createElement('div', { className: "page" }, 
+            React.createElement('button', { className: "back-link", onClick: () => navigateTo('mobiles') }, "← Back"), 
+            React.createElement('div', { className: "card" }, 
+                React.createElement('h3', {}, "Companies"), 
+                React.createElement('p', {}, "Apple, Samsung, Google, OnePlus, Nokia")
+            )
+        ); 
+    }
+    
+    function MobileIMEIPage() { 
+        return React.createElement('div', { className: "page" }, 
+            React.createElement('button', { className: "back-link", onClick: () => navigateTo('mobiles') }, "← Back"), 
+            React.createElement('div', { className: "card" }, 
+                React.createElement('h3', {}, "IMEI Database"), 
+                React.createElement('p', {}, "356123456789012, 490154203237518, 352113106745982")
+            )
+        ); 
+    }
+    
+    // Bank Page
+    function BankPage() {
+        const banks = ['Alfalah Bank', 'Meezan Bank', 'HBL Bank', 'Habib Bank', 'National Bank', 'New Bank'];
+        return React.createElement('div', { className: "page" },
+            React.createElement('button', { className: "back-link", onClick: () => navigateTo('dashboard') }, "← Dashboard"),
+            React.createElement('h2', {}, "🏦 Banking"),
+            React.createElement('div', { className: "grid-2" },
+                banks.map(b => React.createElement('button', { key: b, className: "cat-btn", onClick: () => navigateTo(`bank_${b}`) }, b))
+            )
+        );
+    }
+    
+    function BankDetailPage({ bankName }) {
+        return React.createElement('div', { className: "page" },
+            React.createElement('button', { className: "back-link", onClick: () => navigateTo('bank') }, "← Banks"),
+            React.createElement('div', { className: "card" },
+                React.createElement('h3', {}, bankName),
+                React.createElement('p', {}, "Account: ****3456"),
+                React.createElement('p', {}, "Balance: $12,450"),
+                React.createElement('p', {}, "Last transaction: 04/10/2025")
+            )
+        );
+    }
+    
+    // Property & Notes
+    function PropertyPage() {
+        return React.createElement('div', { className: "page" },
+            React.createElement('button', { className: "back-link", onClick: () => navigateTo('dashboard') }, "← Dashboard"),
+            React.createElement('div', { className: "card" },
+                React.createElement('h3', {}, "🏠 Property Portfolio"),
+                React.createElement('p', {}, "• Downtown Apartment - $250k"),
+                React.createElement('p', {}, "• Commercial Plaza - $1.2M"),
+                React.createElement('p', {}, "• Lake House - $490k")
+            )
+        );
+    }
+    
+    function NotesPage() {
+        const [notes, setNotes] = useState([]);
+        const [noteText, setNoteText] = useState('');
+        
+        const addNote = () => {
+            if (noteText.trim()) {
+                setNotes([...notes, noteText]);
+                setNoteText('');
+            }
+        };
+        
+        return React.createElement('div', { className: "page" },
+            React.createElement('button', { className: "back-link", onClick: () => navigateTo('dashboard') }, "← Dashboard"),
+            React.createElement('div', { className: "card" },
+                React.createElement('h3', {}, "📝 Quick Notes"),
+                React.createElement('input', { className: "input", placeholder: "Write note...", value: noteText, onChange: (e) => setNoteText(e.target.value) }),
+                React.createElement('button', { className: "btn-primary", onClick: addNote }, "Add Note"),
+                React.createElement('hr', {}),
+                notes.map((n, i) => React.createElement('div', { key: i, style: { padding: '8px 0', borderBottom: '1px solid #eee' } }, n))
+            )
+        );
+    }
+    
+    // Main App Router
+    function App() {
+        loadSession();
+        loadEntries();
+        
+        // Handle bank detail pages
+        if (currentPage.startsWith('bank_')) {
+            const bankName = currentPage.replace('bank_', '');
+            return React.createElement(BankDetailPage, { bankName });
+        }
+        
+        switch(currentPage) {
+            case 'login': return React.createElement(LoginPage);
+            case 'signup': return React.createElement(SignupPage);
+            case 'dashboard': return currentUser ? React.createElement(DashboardPage) : React.createElement(LoginPage);
+            case 'cash': return currentUser ? React.createElement(CashPage) : React.createElement(LoginPage);
+            case 'cash_expenses': return currentUser ? React.createElement(ExpensesPage) : React.createElement(LoginPage);
+            case 'cash_income': return currentUser ? React.createElement(IncomePage) : React.createElement(LoginPage);
+            case 'cash_history': return currentUser ? React.createElement(HistoryPage) : React.createElement(LoginPage);
+            case 'cash_insights': return currentUser ? React.createElement(InsightsPage) : React.createElement(LoginPage);
+            case 'cash_budget': return currentUser ? React.createElement(BudgetPage) : React.createElement(LoginPage);
+            case 'cash_income_form': return currentUser ? React.createElement(IncomeFormPage) : React.createElement(LoginPage);
+            case 'sims': return currentUser ? React.createElement(SimsPage) : React.createElement(LoginPage);
+            case 'sims_issue': return currentUser ? React.createElement(SimsIssuePage) : React.createElement(LoginPage);
+            case 'sims_stock': return currentUser ? React.createElement(SimsStockPage) : React.createElement(LoginPage);
+            case 'mobiles': return currentUser ? React.createElement(MobilesPage) : React.createElement(LoginPage);
+            case 'mobiles_name': return currentUser ? React.createElement(MobileNamePage) : React.createElement(LoginPage);
+            case 'mobiles_company': return currentUser ? React.createElement(MobileCompanyPage) : React.createElement(LoginPage);
+            case 'mobiles_imei': return currentUser ? React.createElement(MobileIMEIPage) : React.createElement(LoginPage);
+            case 'bank': return currentUser ? React.createElement(BankPage) : React.createElement(LoginPage);
+            case 'property': return currentUser ? React.createElement(PropertyPage) : React.createElement(LoginPage);
+            case 'notes': return currentUser ? React.createElement(NotesPage) : React.createElement(LoginPage);
+            default: return currentUser ? React.createElement(DashboardPage) : React.createElement(LoginPage);
+        }
+    }
+    
+    // Render function
+    function render() {
+        const root = ReactDOM.createRoot(document.getElementById('app'));
+        root.render(React.createElement(App));
+    }
+    
+    // Initial render
+    render();
+</script>
+</body>
+</html>
